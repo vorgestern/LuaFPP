@@ -1,6 +1,6 @@
 
 XFILES   := main
-CPPFLAGS := -I/usr/include/lua5.4
+CPPFLAGS := -I/usr/include/lua5.4 -I LuaAide/include
 CXXFLAGS := --std=c++20 -Wall -Werror
 .PHONY: clean dir
 
