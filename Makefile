@@ -4,15 +4,21 @@ CPPFLAGS := -I/usr/include/lua5.4
 CXXFLAGS := --std=c++20 -Wall -Werror
 .PHONY: clean dir
 
-all: dir luafils.so
+all: dir luafils.so LuaAide/libLuaAide.a
 clean:
 	@rm -rf b/* luafils.so
+	@make -C LuaAide clean
 dir:
 	@mkdir -p b
 
 # ============================================================
 
-luafils.so: b/main.o
+LuaAide/libLuaAide.a:
+	make -j -C LuaAide all
+
+# ============================================================
+
+luafils.so: b/main.o LuaAide/libLuaAide.a
 	g++ -shared -fpic -o $@ $^
 
 b/%.o: src/%.cpp
