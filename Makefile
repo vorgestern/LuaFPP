@@ -21,5 +21,5 @@ LuaAide/libLuaAide.a:
 luafils.so: b/main.o LuaAide/libLuaAide.a
 	g++ -shared -fpic -o $@ $^
 
-b/%.o: src/%.cpp
+b/%.o: src/%.cpp LuaAide/include/LuaAide.h
 	g++ -c -Wall -Werror -fpic -o $@ $< $(CPPFLAGS) $(CXXFLAGS)
