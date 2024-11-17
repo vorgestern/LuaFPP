@@ -131,8 +131,35 @@ extern "C" int mymkdir(lua_State*L)
     if (!filesystem::create_directories(neu, ec) && ec.value()!=0)
     {
         char pad[100];
-        snprintf(pad, sizeof(pad), "system error %d for cd('", ec.value());
+        snprintf(pad, sizeof(pad), "system error %d for mkdir('", ec.value());
         const string meld=pad+neu.string()+"')";
+        return Q<<meld>>luaerror;
+    }
+    else return 0;
+}
+
+extern "C" int myrmdir(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)<1) return Q<<"rmdir requires argument (string path)">>luaerror;
+    const fspath toremove=Q.tostring(1);
+    error_code ec;
+    if (auto f=filesystem::is_directory(toremove, ec); !f || ec.value()!=0)
+    {
+        if (!f) return Q<<string("rmdir('"+toremove.string()+"'): not a directory")>>luaerror;
+        else
+        {
+            char pad[100];
+            snprintf(pad, sizeof(pad), "system error %d for rmdir/is_directory('", ec.value());
+            const string meld=pad+toremove.string()+"')";
+            return Q<<meld>>luaerror;
+        }
+    }
+    if (!filesystem::remove(toremove, ec) && ec.value()!=0)
+    {
+        char pad[100];
+        snprintf(pad, sizeof(pad), "system error %d for rmdir('", ec.value());
+        const string meld=pad+toremove.string()+"')";
         return Q<<meld>>luaerror;
     }
     else return 0;
@@ -150,7 +177,8 @@ extern "C" int luaopen_luafils(lua_State*L)
         <<cd>>LuaField("cd")
         <<subdirs>>LuaField("subdirs")
         <<walkdir>>LuaField("walkdir")
-        <<mymkdir>>LuaField("mkdir");
+        <<mymkdir>>LuaField("mkdir")
+        <<myrmdir>>LuaField("rmdir");
     return 1;
 }
 
