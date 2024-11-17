@@ -122,6 +122,22 @@ extern "C" int walkdir(lua_State*L)
     return 1;
 }
 
+extern "C" int mymkdir(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)<1) return Q<<"mkdir requires argument (string path)">>luaerror;
+    const fspath neu=Q.tostring(1);
+    error_code ec;
+    if (!filesystem::create_directories(neu, ec) && ec.value()!=0)
+    {
+        char pad[100];
+        snprintf(pad, sizeof(pad), "system error %d for cd('", ec.value());
+        const string meld=pad+neu.string()+"')";
+        return Q<<meld>>luaerror;
+    }
+    else return 0;
+}
+
 } // anon
 
 extern "C" int luaopen_luafils(lua_State*L)
@@ -133,21 +149,26 @@ extern "C" int luaopen_luafils(lua_State*L)
         <<pwd>>LuaField("pwd")
         <<cd>>LuaField("cd")
         <<subdirs>>LuaField("subdirs")
-        <<walkdir>>LuaField("walkdir");
+        <<walkdir>>LuaField("walkdir")
+        <<mymkdir>>LuaField("mkdir");
     return 1;
 }
 
-// lua lfs             LuaFils
-// ===========         =======
+// lua lfs 1.8.0       LuaFils
+// =============       =======
 // attributes
 // chdir               cd
 // currentdir          pwd
 // dir                 (walkdir)
+// link
 // lock
-// mkdir
+// mkdir               mkdir
 // rmdir
+// symlinkattributes
+// setmode
 // touch
 // unlock
+// lock_dir
 
 // lfs attributes
 // ==============
