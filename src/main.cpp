@@ -146,12 +146,12 @@ extern "C" int myrmdir(lua_State*L)
     error_code ec;
     if (auto f=filesystem::is_directory(toremove, ec); !f || ec.value()!=0)
     {
-        if (!f) return Q<<string("rmdir('"+toremove.string()+"'): not a directory")>>luaerror;
+        if (!f) return Q<<string("rmdir('"+toremove.string()+"'): not a directory.")>>luaerror;
         else
         {
             char pad[100];
             snprintf(pad, sizeof(pad), "system error %d for rmdir/is_directory('", ec.value());
-            const string meld=pad+toremove.string()+"')";
+            const string meld=pad+toremove.string()+"').";
             return Q<<meld>>luaerror;
         }
     }
@@ -163,6 +163,33 @@ extern "C" int myrmdir(lua_State*L)
         return Q<<meld>>luaerror;
     }
     else return 0;
+}
+
+extern "C" int mytouch(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)<1) return Q<<"touch requires argument (string path)">>luaerror;
+    const fspath totouch=Q.tostring(1);
+    error_code ec;
+    if (auto f=filesystem::is_regular_file(totouch, ec); !f || ec.value()!=0)
+    {
+        if (!f) return Q<<string("touch('"+totouch.string()+"'): not a file or not a regular file.")>>luaerror;
+        else
+        {
+            char pad[100];
+            snprintf(pad, sizeof(pad), "system error %d for is_regular_file('", ec.value());
+            const string meld=pad+totouch.string()+"').";
+            return Q<<meld>>luaerror;
+        }
+    }
+    if (filesystem::last_write_time(totouch, chrono::file_clock::now(), ec); ec.value()!=0)
+    {
+        char pad[100];
+        snprintf(pad, sizeof(pad), "system error %d for touch('", ec.value());
+        const string meld=pad+totouch.string()+"').";
+        return Q<<meld>>luaerror;
+    }
+    return 0;
 }
 
 } // anon
@@ -178,7 +205,8 @@ extern "C" int luaopen_luafils(lua_State*L)
         <<subdirs>>LuaField("subdirs")
         <<walkdir>>LuaField("walkdir")
         <<mymkdir>>LuaField("mkdir")
-        <<myrmdir>>LuaField("rmdir");
+        <<myrmdir>>LuaField("rmdir")
+        <<mytouch>>LuaField("touch");
     return 1;
 }
 
@@ -191,7 +219,7 @@ extern "C" int luaopen_luafils(lua_State*L)
 // link
 // lock
 // mkdir               mkdir
-// rmdir
+// rmdir               rmdir
 // symlinkattributes
 // setmode
 // touch
