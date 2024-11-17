@@ -49,6 +49,39 @@ extern "C" int cd(lua_State*L)
     else Q<<"cd requires argument (string path)">>luaerror;
     return 0;
 }
+
+extern "C" int subdirs(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)==1)
+    {
+        if (Q.hasstringat(-1))
+        {
+            const fspath start(Q.tostring(-1));
+            if (!filesystem::exists(start))
+            {
+                const string meld="subdirs: path does not exist: '"+start.string()+"'";
+                Q<<meld>>luaerror;
+            }
+                    vector<string>subdirs;
+                    for (auto const&entry: filesystem::directory_iterator{start})
+                        if (entry.is_directory())
+                        {
+                            const auto s=entry.path().stem();
+                            subdirs.push_back(s);
+                        }
+                    sort(subdirs.begin(), subdirs.end(), less<string>());
+                    Q<<subdirs;
+                    return 1;
+        }
+        else
+        {
+            const auto meld=string("subdirs(path) requires path to be a string, not ")+tostring(Q.typeat(-1)).data()+".";
+            return Q<<meld>>luaerror;
+        }
+    }
+    else return Q<<"cd requires argument (string path)">>luaerror;
+}
 } // anon
 
 extern "C" int luaopen_luafils(lua_State*L)
@@ -58,6 +91,7 @@ extern "C" int luaopen_luafils(lua_State*L)
         <<"0.1">>LuaField("version")
         <<"https://github.com/vorgestern/LuaFils.git">>LuaField("url")
         <<pwd>>LuaField("pwd")
-        <<cd>>LuaField("cd");
+        <<cd>>LuaField("cd")
+        <<subdirs>>LuaField("subdirs");
     return 1;
 }
