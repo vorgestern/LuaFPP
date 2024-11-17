@@ -30,9 +30,11 @@ for k,v in ipairs(A) do
     print("==", k, s)
 end
 
-if not X.touch "nixda.txt" then
-    io.output "nixda.txt" :write "nixda"
-    io.close()
+local f,err=X.touch "nixda.txt"
+if not f then
+    -- io.output "nixda.txt" :write "nixda"
+    -- io.close()
+    print("Cannot touch nixda.txt:", err)
 end
 
-X.touch "nixda.txt"
+-- X.touch "nixda.txt"

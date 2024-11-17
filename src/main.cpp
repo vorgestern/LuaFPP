@@ -28,26 +28,25 @@ extern "C" int cd(lua_State*L)
             if (!filesystem::exists(neu))
             {
                 const string meld="cd: path does not exist: '"+neu.string()+"'";
-                Q<<meld>>luaerror;
+                return Q<<luanil<<meld, 2;
             }
             std::error_code ec;
             current_path(neu, ec);
-            if (!ec) return 0;
+            if (!ec) return Q<<true, 1;
             else
             {
                 sprintf(pad, "system error %d for cd('", ec.value());
                 const string meld=pad+neu.string()+"')";
-                Q<<meld>>luaerror;
+                return Q<<luanil<<meld, 2;
             }
         }
         else
         {
             const auto meld=string("cd(path) requires path to be a string, not ")+tostring(Q.typeat(-1)).data()+".";
-            Q<<meld>>luaerror;
+            return Q<<luanil<<meld, 2;
         }
     }
-    else Q<<"cd requires argument (string path)">>luaerror;
-    return 0;
+    else return Q<<luanil<<"cd requires argument (string path)", 2;
 }
 
 extern "C" int subdirs(lua_State*L)
@@ -133,9 +132,9 @@ extern "C" int mymkdir(lua_State*L)
         char pad[100];
         snprintf(pad, sizeof(pad), "system error %d for mkdir('", ec.value());
         const string meld=pad+neu.string()+"')";
-        return Q<<meld>>luaerror;
+        return Q<<luanil<<meld, 2;
     }
-    else return 0;
+    else return Q<<true, 1;
 }
 
 extern "C" int myrmdir(lua_State*L)
@@ -146,13 +145,13 @@ extern "C" int myrmdir(lua_State*L)
     error_code ec;
     if (auto f=filesystem::is_directory(toremove, ec); !f || ec.value()!=0)
     {
-        if (!f) return Q<<string("rmdir('"+toremove.string()+"'): not a directory.")>>luaerror;
+        if (!f) return Q<<luanil<<string("rmdir('"+toremove.string()+"'): not a directory."), 2;
         else
         {
             char pad[100];
             snprintf(pad, sizeof(pad), "system error %d for rmdir/is_directory('", ec.value());
             const string meld=pad+toremove.string()+"').";
-            return Q<<meld>>luaerror;
+            return Q<<luanil<<meld, 2;
         }
     }
     if (!filesystem::remove(toremove, ec) && ec.value()!=0)
@@ -160,9 +159,9 @@ extern "C" int myrmdir(lua_State*L)
         char pad[100];
         snprintf(pad, sizeof(pad), "system error %d for rmdir('", ec.value());
         const string meld=pad+toremove.string()+"')";
-        return Q<<meld>>luaerror;
+        return Q<<luanil<<meld, 2;
     }
-    else return 0;
+    else return Q<<true, 1;
 }
 
 extern "C" int mytouch(lua_State*L)
@@ -173,13 +172,13 @@ extern "C" int mytouch(lua_State*L)
     error_code ec;
     if (auto f=filesystem::is_regular_file(totouch, ec); !f || ec.value()!=0)
     {
-        if (!f) return Q<<string("touch('"+totouch.string()+"'): not a file or not a regular file.")>>luaerror;
+        if (!f) return Q<<luanil<<string("touch('"+totouch.string()+"'): not a file or not a regular file."), 2;
         else
         {
             char pad[100];
             snprintf(pad, sizeof(pad), "system error %d for is_regular_file('", ec.value());
             const string meld=pad+totouch.string()+"').";
-            return Q<<meld>>luaerror;
+            return Q<<luanil<<meld, 2;
         }
     }
     if (filesystem::last_write_time(totouch, chrono::file_clock::now(), ec); ec.value()!=0)
@@ -187,9 +186,9 @@ extern "C" int mytouch(lua_State*L)
         char pad[100];
         snprintf(pad, sizeof(pad), "system error %d for touch('", ec.value());
         const string meld=pad+totouch.string()+"').";
-        return Q<<meld>>luaerror;
+        return Q<<luanil<<meld, 2;
     }
-    return 0;
+    return Q<<true,1;
 }
 
 } // anon
@@ -215,7 +214,7 @@ extern "C" int luaopen_luafils(lua_State*L)
 // attributes
 // chdir               cd
 // currentdir          pwd
-// dir                 (walkdir)
+// dir                 (walkdir) (subdirs)
 // link
 // lock
 // mkdir               mkdir
