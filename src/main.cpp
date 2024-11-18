@@ -1,13 +1,88 @@
 
 #include <lua.hpp>
 #include <LuaAide.h>
-
 #include <filesystem>
 
 using namespace std;
 using fspath=filesystem::path;
 
 namespace {
+
+                string permstring(const fspath&was)
+                {
+                    const auto st=filesystem::status(was);
+                    // const auto t=st.type(); // file_status::type
+                    const auto p=st.permissions(); // file_status::permissions
+                    const filesystem::perms P[9]={
+                        filesystem::perms::owner_read,
+                        filesystem::perms::owner_write,
+                        filesystem::perms::owner_exec,
+                        filesystem::perms::group_read,
+                        filesystem::perms::group_write,
+                        filesystem::perms::group_exec,
+                        filesystem::perms::others_read,
+                        filesystem::perms::others_write,
+                        filesystem::perms::others_exec
+                    };
+                    const char pp[]="rwxrwxrwx";
+                    const auto none=filesystem::perms::none;
+                    char pad[]="---------";
+                    for (auto j=0; j<9; ++j) pad[j]=(p&P[j])!=none?pp[j]:'-';
+                    return pad;
+                }
+
+                string typestring(filesystem::file_status s)
+                {
+                    char pad[]="........";
+                    if (filesystem::is_regular_file(s))     pad[0]='F'; // regular file
+                    if (filesystem::is_directory(s))        pad[1]='D'; // directory
+                    if (filesystem::is_block_file(s))       pad[2]='B'; // block device
+                    if (filesystem::is_character_file(s))   pad[3]='C'; // character device
+                    if (filesystem::is_fifo(s))             pad[4]='P'; // named IPC pipe
+                    if (filesystem::is_socket(s))           pad[5]='S'; // named IPC socket
+                    if (filesystem::is_symlink(s))          pad[6]='L'; // symlink
+                    if (!filesystem::exists(s))             pad[7]='X'; // does not exist
+                    return pad;
+                }
+
+                [[maybe_unused]] string typestring(const fspath&was)
+                {
+                    return typestring(filesystem::status(was)); // .type()
+                }
+
+extern "C" int permissions(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)<1) return Q<<"permissions requires argument (string path)">>luaerror;
+    const fspath was=Q.tostring(1);
+    return Q<<permstring(was), 1;
+}
+
+extern "C" int type(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)<1) return Q<<"type requires argument (string path)">>luaerror;
+    const fspath was=Q.tostring(1);
+    return Q<<typestring(was), 1;
+}
+
+extern "C" int numlinks(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)<1) return Q<<"numlinks requires argument (string path)">>luaerror;
+    const fspath was=Q.tostring(1);
+    error_code ec;
+    const auto nlink=hard_link_count(was, ec);
+    if (ec.value()!=0)
+    {
+        char pad[100];
+        sprintf(pad, "system error %d for numlinks('", ec.value());
+        const string meld=pad+was.string()+"')";
+        return Q<<luanil<<meld, 2;
+    }
+    else return Q<<(int)nlink, 1;
+}
+
 extern "C" int pwd(lua_State*L)
 {
     LuaStack Q(L);
@@ -30,7 +105,7 @@ extern "C" int cd(lua_State*L)
                 const string meld="cd: path does not exist: '"+neu.string()+"'";
                 return Q<<luanil<<meld, 2;
             }
-            std::error_code ec;
+            error_code ec;
             current_path(neu, ec);
             if (!ec) return Q<<true, 1;
             else
@@ -199,6 +274,9 @@ extern "C" int luaopen_luafils(lua_State*L)
     Q   <<LuaTable()
         <<"0.1">>LuaField("version")
         <<"https://github.com/vorgestern/LuaFils.git">>LuaField("url")
+        <<permissions>>LuaField("permissions")
+        <<type>>LuaField("type")
+        <<numlinks>>LuaField("numlinks")
         <<pwd>>LuaField("pwd")
         <<cd>>LuaField("cd")
         <<subdirs>>LuaField("subdirs")
@@ -221,23 +299,25 @@ extern "C" int luaopen_luafils(lua_State*L)
 // rmdir               rmdir
 // symlinkattributes
 // setmode
-// touch
+// touch               touch
 // unlock
 // lock_dir
 
-// lfs attributes
-// ==============
+// lfs attributes               LuaFils
+// ==============               =======
 // dev
-// ino    (U)
-// mode
-// nlink
+// ino    (U)                               (uintmax_t hard_link_count(const fspath&, std::error_code&))
+//                                          (filesystem::directory_entry::hard_link_count()) (cached values)
+// mode                         X.type(path)
+// nlink                        X.numlinks(path)
 // uid    (U, W==0)
 // gid    (U, W==0)
 // rdev   (U, W==dev)
 // access
-// modification
+// modification                             (filesystem::file_time_type last_write_time(const fspath&, :error_code&))
 // change
-// size
+// size                                     (uintmax_t file_size(const fspath&, error_code&))
+// permissions                  X.permissions(path)
 // blocks  (U)
 // blksize (U)
 
@@ -245,3 +325,31 @@ extern "C" int luaopen_luafils(lua_State*L)
 // =======================
 // .DF
 // s t
+
+// filesystem::file_status filesystem::status(const fspath&);
+// file_status::type        t=status.type();
+// file_status::permissions p=status.permissions();
+
+// filesystem::perms::
+//   owner_read
+//   owner_write
+//   owner_exec
+//   group_read
+//   group_write
+//   group_exec
+//   others_read
+//   others_write
+//   others_exec
+
+// ls -l
+// total 16
+// drwxr-xr-x 2 user group 4096 May 25 10:45 dir1
+// -rw-r--r-- 1 user group  123 May 25 10:45 file1
+// In this output:
+//      drwxr-xr-x shows the file type and permissions.
+//      2 indicates the number of links.
+//      user is the owner of the file.
+//      group is the group associated with the file.
+//      4096 is the file size in bytes.
+//      May 25 10:45 is the last modification date and time.
+//      dir1 and file1 are the names of the directory and file, respectively.
