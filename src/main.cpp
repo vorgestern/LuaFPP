@@ -83,6 +83,24 @@ extern "C" int numlinks(lua_State*L)
     else return Q<<(int)nlink, 1;
 }
 
+extern "C" int filesize(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)<1) return Q<<"filesize requires argument (string path)">>luaerror;
+    const fspath was=Q.tostring(1);
+    if (is_directory(was)) return Q<<0, 1;
+    error_code ec;
+    const auto numbytes=file_size(was, ec);
+    if (ec.value()!=0)
+    {
+        char pad[100];
+        sprintf(pad, "system error %d for filesize('", ec.value());
+        const string meld=pad+was.string()+"')";
+        return Q<<luanil<<meld, 2;
+    }
+    else return Q<<(int)numbytes, 1;
+}
+
 extern "C" int pwd(lua_State*L)
 {
     LuaStack Q(L);
@@ -277,6 +295,7 @@ extern "C" int luaopen_luafils(lua_State*L)
         <<permissions>>LuaField("permissions")
         <<type>>LuaField("type")
         <<numlinks>>LuaField("numlinks")
+        <<filesize>>LuaField("filesize")
         <<pwd>>LuaField("pwd")
         <<cd>>LuaField("cd")
         <<subdirs>>LuaField("subdirs")
@@ -306,17 +325,17 @@ extern "C" int luaopen_luafils(lua_State*L)
 // lfs attributes               LuaFils
 // ==============               =======
 // dev
-// ino    (U)                               (uintmax_t hard_link_count(const fspath&, std::error_code&))
-//                                          (filesystem::directory_entry::hard_link_count()) (cached values)
+// ino    (U)                                           (uintmax_t hard_link_count(const fspath&, std::error_code&))
+//                                                      (filesystem::directory_entry::hard_link_count()) (cached values)
 // mode                         X.type(path)
 // nlink                        X.numlinks(path)
 // uid    (U, W==0)
 // gid    (U, W==0)
 // rdev   (U, W==dev)
 // access
-// modification                             (filesystem::file_time_type last_write_time(const fspath&, :error_code&))
+// modification                                         (filesystem::file_time_type last_write_time(const fspath&, :error_code&))
 // change
-// size                                     (uintmax_t file_size(const fspath&, error_code&))
+// size                         X.filesize(path)        (uintmax_t file_size(const fspath&, error_code&))
 // permissions                  X.permissions(path)
 // blocks  (U)
 // blksize (U)

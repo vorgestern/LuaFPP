@@ -37,10 +37,8 @@ if not f then
     print("Cannot touch nixda.txt:", err)
 end
 
--- X.touch "nixda.txt"
-
 print "=========="
 for k,v in ipairs(A) do
-    local s=string.format("%s %3d  %s   %s   %s", X.permissions(v.abspath), X.numlinks(v.abspath), X.type(v.abspath), v.type, v.name)
+    local s=string.format("%s %3d  user group %8d %s   %s   %s", X.permissions(v.abspath), X.numlinks(v.abspath), X.filesize(v.abspath), X.type(v.abspath), v.type, v.name)
     print(s)
 end
