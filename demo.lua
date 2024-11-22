@@ -1,7 +1,7 @@
 
-local X=require "luafils"
+local X=require "luafpp"
 
-print "luafils:"
+print "luafpp:"
 for k,v in pairs(X) do print("==", k, v) end
 
 print("pwd", X.pwd())

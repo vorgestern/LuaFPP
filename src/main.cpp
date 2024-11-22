@@ -286,12 +286,12 @@ extern "C" int mytouch(lua_State*L)
 
 } // anon
 
-extern "C" int luaopen_luafils(lua_State*L)
+extern "C" int luaopen_luafpp(lua_State*L)
 {
     LuaStack Q(L);
     Q   <<LuaTable()
         <<"0.1">>LuaField("version")
-        <<"https://github.com/vorgestern/LuaFils.git">>LuaField("url")
+        <<"https://github.com/vorgestern/LuaFPP.git">>LuaField("url")
         <<permissions>>LuaField("permissions")
         <<type>>LuaField("type")
         <<numlinks>>LuaField("numlinks")
@@ -306,7 +306,7 @@ extern "C" int luaopen_luafils(lua_State*L)
     return 1;
 }
 
-// lua lfs 1.8.0       LuaFils
+// lua lfs 1.8.0       LuaFPP
 // =============       =======
 // attributes
 // chdir               cd
@@ -322,8 +322,8 @@ extern "C" int luaopen_luafils(lua_State*L)
 // unlock
 // lock_dir
 
-// lfs attributes               LuaFils
-// ==============               =======
+// lfs attributes               LuaFPP
+// ==============               ======
 // dev
 // ino    (U)                                           (uintmax_t hard_link_count(const fspath&, std::error_code&))
 //                                                      (filesystem::directory_entry::hard_link_count()) (cached values)
@@ -340,8 +340,8 @@ extern "C" int luaopen_luafils(lua_State*L)
 // blocks  (U)
 // blksize (U)
 
-// LuaFils walkdir Konzept
-// =======================
+// LuaFPP walkdir Konzept
+// ======================
 // .DF
 // s t
 
