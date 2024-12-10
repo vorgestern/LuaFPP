@@ -286,7 +286,11 @@ extern "C" int mytouch(lua_State*L)
 
 } // anon
 
-extern "C" int luaopen_luafpp(lua_State*L)
+#ifndef LUAFPP_EXPORTS
+#define LUAFPP_EXPORTS
+#endif
+
+extern "C" LUAFPP_EXPORTS int luaopen_luafpp(lua_State*L)
 {
     LuaStack Q(L);
     Q   <<LuaTable()
