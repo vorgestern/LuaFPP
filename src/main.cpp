@@ -76,7 +76,7 @@ extern "C" int numlinks(lua_State*L)
     if (ec.value()!=0)
     {
         char pad[100];
-        sprintf(pad, "system error %d for numlinks('", ec.value());
+        snprintf(pad, sizeof pad, "system error %d for numlinks('", ec.value());
         const string meld=pad+was.string()+"')";
         return Q<<luanil<<meld, 2;
     }
@@ -94,7 +94,7 @@ extern "C" int filesize(lua_State*L)
     if (ec.value()!=0)
     {
         char pad[100];
-        sprintf(pad, "system error %d for filesize('", ec.value());
+        snprintf(pad, sizeof pad, "system error %d for filesize('", ec.value());
         const string meld=pad+was.string()+"')";
         return Q<<luanil<<meld, 2;
     }
@@ -128,7 +128,7 @@ extern "C" int cd(lua_State*L)
             if (!ec) return Q<<true, 1;
             else
             {
-                sprintf(pad, "system error %d for cd('", ec.value());
+                snprintf(pad, sizeof pad, "system error %d for cd('", ec.value());
                 const string meld=pad+neu.string()+"')";
                 return Q<<luanil<<meld, 2;
             }
@@ -160,7 +160,7 @@ extern "C" int subdirs(lua_State*L)
                         if (entry.is_directory())
                         {
                             const auto s=entry.path().stem();
-                            subdirs.push_back(s);
+                            subdirs.push_back(s.string());
                         }
                     sort(subdirs.begin(), subdirs.end(), less<string>());
                     Q<<subdirs;
@@ -195,21 +195,21 @@ extern "C" int walkdir(lua_State*L)
     {
         const auto filename=entry.path().filename().string();
         if (ignore_dot && filename.starts_with(".")){ ++num_ignored; continue; }
-        if (entry.is_directory()) A.emplace_back('D', filename, entry.path());
-        else if (entry.is_regular_file()) A.emplace_back('F', filename, entry.path());
-        else A.emplace_back('?', filename, entry.path());
+        if (entry.is_directory()) A.emplace_back('D', filename, entry.path().string());
+        else if (entry.is_regular_file()) A.emplace_back('F', filename, entry.path().string());
+        else A.emplace_back('?', filename, entry.path().string());
     }
     sort(A.begin(), A.end(), less<fsentry>());
 
-    Q<<LuaTable(0,0);
+    Q<<LuaTable({0,0});
     const auto T1=Q.index(-1);
     unsigned e=0;
     for (const auto&entry: A)
     {
-        Q<<LuaTable(0,2)<<string(1, entry.Type)>>LuaField("type")
+        Q<<LuaTable({0,2})<<string(1, entry.Type)>>LuaField("type")
                         <<entry.name>>LuaField("name")
                         <<entry.abspath>>LuaField("abspath")
-                        >>LuaElement(stackindex(T1), ++e);
+                        >>LuaElement({stackindex(T1), ++e});
     }
     return 1;
 }
