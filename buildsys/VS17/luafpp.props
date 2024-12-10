@@ -16,7 +16,7 @@
             <WarningLevel>Level3</WarningLevel>
             <SDLCheck>true</SDLCheck>
             <AdditionalIncludeDirectories>..\..\LuaAide\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-            <PreprocessorDefinitions>LUAFPP_EXPORTS=__declspec(dllexport);_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <PreprocessorDefinitions>LUAFPP_EXPORTS=__declspec(dllexport);_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
             <LanguageStandard>stdcpp20</LanguageStandard>
             <PrecompiledHeader>NotUsing</PrecompiledHeader>
@@ -24,7 +24,6 @@
             <PrecompiledHeaderOutputFile/>
         </ClCompile>
         <Link>
-            <SubSystem>Windows</SubSystem>
             <GenerateDebugInformation>true</GenerateDebugInformation>
             <EnableUAC>false</EnableUAC>
             <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>

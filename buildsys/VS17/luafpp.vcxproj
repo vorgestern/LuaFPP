@@ -50,6 +50,7 @@
   <ImportGroup Label="PropertySheets">
     <Import Project="Lua.props" />
     <Import Project="luafpp.props" />
+    <Import Project="Windows.props" />
   </ImportGroup>
   <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
