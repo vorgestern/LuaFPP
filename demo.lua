@@ -47,5 +47,9 @@ print "========== absolute"
 print("Makefile, absolute:", X.absolute "Makefile")
 
 print "========== canonical"
-local a="buildsys/..\\Makefile"
-print(a..", absolute:", X.canonical(a))
+local a="buildsys/..\\Makefile99"
+print(a..", canonical:", X.canonical(a))
+
+print "========== weakly_canonical"
+local a="buildsys/..\\Makefile99"
+print(a..", weakly_canonical:", X.weakly_canonical(a))
