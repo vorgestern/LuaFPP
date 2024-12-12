@@ -53,3 +53,7 @@ print(a..", canonical:", X.canonical(a))
 print "========== weakly_canonical"
 local a="buildsys/..\\Makefile99"
 print(a..", weakly_canonical:", X.weakly_canonical(a))
+
+print "========== relative"
+local a=X.absolute "../master/src/main.cpp"
+print(a..", relative:", X.relative(a))

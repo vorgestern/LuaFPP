@@ -335,6 +335,23 @@ int myweakly_canonical(lua_State*L)
     return Q<<neu.string(),1;
 }
 
+int myrelative(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)<1) return Q<<"relative requires argument (string path)">>luaerror;
+    const fspath toconvert=Q.tostring(1);
+    error_code ec;
+    const auto neu=filesystem::relative(toconvert, ec);
+    if (ec.value()!=0)
+    {
+        char pad[100];
+        snprintf(pad, sizeof(pad), "system error %d for filesystem::relative('", ec.value());
+        const string meld=pad+toconvert.string()+"').";
+        return Q<<luanil<<meld, 2;
+    }
+    return Q<<neu.string(),1;
+}
+
 } // anon
 
 #ifndef LUAFPP_EXPORTS
@@ -360,6 +377,7 @@ extern "C" LUAFPP_EXPORTS int luaopen_luafpp(lua_State*L)
         <<mytouch>>LuaField("touch")
         <<mycanonical>>LuaField("canonical")
         <<myweakly_canonical>>LuaField("weakly_canonical")
+        <<myrelative>>LuaField("relative")
         <<myabsolute>>LuaField("absolute");
     return 1;
 }
