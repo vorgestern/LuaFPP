@@ -284,6 +284,23 @@ extern "C" int mytouch(lua_State*L)
     return Q<<true,1;
 }
 
+int myabsolute(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)<1) return Q<<"absolute requires argument (string path)">>luaerror;
+    const fspath toconvert=Q.tostring(1);
+    error_code ec;
+    const auto neu=filesystem::absolute(toconvert, ec);
+    if (ec.value()!=0)
+    {
+        char pad[100];
+        snprintf(pad, sizeof(pad), "system error %d for filesystem::absolute('", ec.value());
+        const string meld=pad+toconvert.string()+"').";
+        return Q<<luanil<<meld, 2;
+    }
+    return Q<<neu.string(),1;
+}
+
 } // anon
 
 #ifndef LUAFPP_EXPORTS
@@ -306,73 +323,7 @@ extern "C" LUAFPP_EXPORTS int luaopen_luafpp(lua_State*L)
         <<walkdir>>LuaField("walkdir")
         <<mymkdir>>LuaField("mkdir")
         <<myrmdir>>LuaField("rmdir")
-        <<mytouch>>LuaField("touch");
+        <<mytouch>>LuaField("touch")
+        <<myabsolute>>LuaField("absolute");
     return 1;
 }
-
-// lua lfs 1.8.0       LuaFPP
-// =============       =======
-// attributes
-// chdir               cd
-// currentdir          pwd
-// dir                 (walkdir) (subdirs)
-// link
-// lock
-// mkdir               mkdir
-// rmdir               rmdir
-// symlinkattributes
-// setmode
-// touch               touch
-// unlock
-// lock_dir
-
-// lfs attributes               LuaFPP
-// ==============               ======
-// dev
-// ino    (U)                                           (uintmax_t hard_link_count(const fspath&, std::error_code&))
-//                                                      (filesystem::directory_entry::hard_link_count()) (cached values)
-// mode                         X.type(path)
-// nlink                        X.numlinks(path)
-// uid    (U, W==0)
-// gid    (U, W==0)
-// rdev   (U, W==dev)
-// access
-// modification                                         (filesystem::file_time_type last_write_time(const fspath&, :error_code&))
-// change
-// size                         X.filesize(path)        (uintmax_t file_size(const fspath&, error_code&))
-// permissions                  X.permissions(path)
-// blocks  (U)
-// blksize (U)
-
-// LuaFPP walkdir Konzept
-// ======================
-// .DF
-// s t
-
-// filesystem::file_status filesystem::status(const fspath&);
-// file_status::type        t=status.type();
-// file_status::permissions p=status.permissions();
-
-// filesystem::perms::
-//   owner_read
-//   owner_write
-//   owner_exec
-//   group_read
-//   group_write
-//   group_exec
-//   others_read
-//   others_write
-//   others_exec
-
-// ls -l
-// total 16
-// drwxr-xr-x 2 user group 4096 May 25 10:45 dir1
-// -rw-r--r-- 1 user group  123 May 25 10:45 file1
-// In this output:
-//      drwxr-xr-x shows the file type and permissions.
-//      2 indicates the number of links.
-//      user is the owner of the file.
-//      group is the group associated with the file.
-//      4096 is the file size in bytes.
-//      May 25 10:45 is the last modification date and time.
-//      dir1 and file1 are the names of the directory and file, respectively.
