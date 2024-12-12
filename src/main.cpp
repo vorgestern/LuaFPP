@@ -341,15 +341,25 @@ int myrelative(lua_State*L)
     if (height(Q)<1) return Q<<"relative requires argument (string path)">>luaerror;
     const fspath toconvert=Q.tostring(1);
     error_code ec;
-    const auto neu=filesystem::relative(toconvert, ec);
-    if (ec.value()!=0)
+    if (height(Q)>1)
     {
+        const fspath base=Q.tostring(2);
+        const auto neu=filesystem::relative(toconvert, base, ec);
+        if (ec.value()==0) return Q<<neu.string(), 1;
+        char pad[100];
+        snprintf(pad, sizeof(pad), "system error %d for filesystem::relative('", ec.value());
+        const string meld=pad+toconvert.string()+"', '"+base.string()+"').";
+        return Q<<luanil<<meld, 2;
+    }
+    else
+    {
+        const auto neu=filesystem::relative(toconvert, ec);
+        if (ec.value()==0) return Q<<neu.string(), 1;
         char pad[100];
         snprintf(pad, sizeof(pad), "system error %d for filesystem::relative('", ec.value());
         const string meld=pad+toconvert.string()+"').";
         return Q<<luanil<<meld, 2;
     }
-    return Q<<neu.string(),1;
 }
 
 } // anon

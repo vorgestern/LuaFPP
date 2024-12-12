@@ -57,3 +57,8 @@ print(a..", weakly_canonical:", X.weakly_canonical(a))
 print "========== relative"
 local a=X.absolute "../master/src/main.cpp"
 print(a..", relative:", X.relative(a))
+
+print "========== relative base"
+local a=X.absolute "../master/src/main.cpp"
+local b=X.absolute "../master/buildsys"
+print(a..", relative:", X.relative(a, b))
