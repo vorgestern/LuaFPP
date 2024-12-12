@@ -43,5 +43,9 @@ for k,v in ipairs(A) do
     print(s)
 end
 
-print "=========="
+print "========== absolute"
 print("Makefile, absolute:", X.absolute "Makefile")
+
+print "========== canonical"
+local a="buildsys/..\\Makefile"
+print(a..", absolute:", X.canonical(a))

@@ -301,6 +301,23 @@ int myabsolute(lua_State*L)
     return Q<<neu.string(),1;
 }
 
+int mycanonical(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)<1) return Q<<"canonical requires argument (string path)">>luaerror;
+    const fspath toconvert=Q.tostring(1);
+    error_code ec;
+    const auto neu=filesystem::canonical(toconvert, ec);
+    if (ec.value()!=0)
+    {
+        char pad[100];
+        snprintf(pad, sizeof(pad), "system error %d for filesystem::canonical('", ec.value());
+        const string meld=pad+toconvert.string()+"').";
+        return Q<<luanil<<meld, 2;
+    }
+    return Q<<neu.string(),1;
+}
+
 } // anon
 
 #ifndef LUAFPP_EXPORTS
@@ -324,6 +341,7 @@ extern "C" LUAFPP_EXPORTS int luaopen_luafpp(lua_State*L)
         <<mymkdir>>LuaField("mkdir")
         <<myrmdir>>LuaField("rmdir")
         <<mytouch>>LuaField("touch")
+        <<mycanonical>>LuaField("canonical")
         <<myabsolute>>LuaField("absolute");
     return 1;
 }
