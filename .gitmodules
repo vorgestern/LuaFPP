@@ -1,3 +1,6 @@
 [submodule "LuaAide"]
 	path = LuaAide
 	url = https://github.com/vorgestern/LuaAide.git
+[submodule "ulutest"]
+	path = ulutest
+	url = https://github.com/vorgestern/ulutest.git
