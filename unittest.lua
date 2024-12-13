@@ -33,6 +33,12 @@ ULU.RUN(
 },
 
 {
+    name="url",
+    TT("present", function(T) T:ASSERT_EQ("string", type(X.url)) end),
+    TT("value", function(T) T:ASSERT_EQ("https://github.com/vorgestern/LuaFPP.git", X.url) end)
+},
+
+{
     name="pwd",
     TT("present", function(T) T:ASSERT_EQ("function", type(X.pwd)) end),
     TT("string", function(T) T:ASSERT_EQ("string", type(X.pwd())) end),
@@ -113,6 +119,49 @@ ULU.RUN(
         local sep=package.config:sub(1,1)
         T:ASSERT(a:match "src"..sep.. "main.cpp")
     end),
+    -- TT("removesepsep", ..)
+    -- TT("removesepdotsep", ..)
+},
+
+{
+    name="weakly_canonical",
+    TT("present", function(T) T:ASSERT_EQ("function", type(X.weakly_canonical)) end),
+},
+
+{
+    name="relative",
+    TT("present", function(T) T:ASSERT_EQ("function", type(X.relative)) end),
+},
+
+{
+    name="mkdir",
+    TT("present", function(T) T:ASSERT_EQ("function", type(X.mkdir)) end),
+},
+
+{
+    name="rmdir",
+    TT("present", function(T) T:ASSERT_EQ("function", type(X.rmdir)) end),
+},
+
+{
+    name="numlinks",
+    TT("present", function(T) T:ASSERT_EQ("function", type(X.numlinks)) end),
+    TT("number", function(T) T:ASSERT_EQ("number", type(X.numlinks "Makefile")) end),
+},
+
+{
+    name="type",
+    TT("present", function(T) T:ASSERT_EQ("function", type(X.type)) end),
+    TT("string", function(T) T:ASSERT_EQ("string", type(X.type "Makefile")) end),
+    TT("value F", function(T) T:ASSERT_EQ("F.......", X.type "Makefile") end),
+    TT("value D", function(T) T:ASSERT_EQ(".D......", X.type "src") end),
+},
+
+{
+    name="permissions",
+    TT("present", function(T) T:ASSERT_EQ("function", type(X.permissions)) end),
+    TT("string", function(T) T:ASSERT_EQ("string", type(X.permissions "Makefile")) end),
+    TT("rwxrwxrwx", function(T) T:ASSERT_EQ("rwxrwxrwx", X.permissions "Makefile") end),
 }
 
 )
