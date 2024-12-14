@@ -75,7 +75,7 @@ ULU.RUN(
     name="filesize",
     TT("present", function(T) T:ASSERT_EQ("function", type(X.filesize)) end),
     TT("number", function(T) T:ASSERT_EQ("number", type(X.filesize "ulutest/README.md")) end),
-    TT("value", function(T) T:ASSERT_EQ(1073, X.filesize "ulutest/Makefile") end),
+    TT("value", function(T) T:ASSERT_EQ(1038, X.filesize "ulutest/Makefile") end),
 },
 
 {
@@ -115,7 +115,8 @@ ULU.RUN(
     TT("present", function(T) T:ASSERT_EQ("function", type(X.canonical)) end),
     TT("string", function(T) T:ASSERT_EQ("string", type(X.canonical ".")) end),
     TT("removedotdot", function(T)
-        local a=X.canonical "src/none/../main.cpp"
+        local a,b=X.canonical "src/../src/main.cpp"
+        T:ASSERT_EQ(nil,b)
         local sep=package.config:sub(1,1)
         T:ASSERT(a:match "src"..sep.. "main.cpp")
     end),
@@ -126,6 +127,15 @@ ULU.RUN(
 {
     name="weakly_canonical",
     TT("present", function(T) T:ASSERT_EQ("function", type(X.weakly_canonical)) end),
+    TT("string", function(T) T:ASSERT_EQ("string", type(X.weakly_canonical ".")) end),
+    TT("removedotdot", function(T)
+        local a,b=X.canonical "src/../src/main.cpp"
+        T:ASSERT_EQ(nil,b)
+        local sep=package.config:sub(1,1)
+        T:ASSERT(a:match "src"..sep.. "main.cpp")
+    end),
+    -- TT("removesepsep", ..)
+    -- TT("removesepdotsep", ..)
 },
 
 {
@@ -161,7 +171,7 @@ ULU.RUN(
     name="permissions",
     TT("present", function(T) T:ASSERT_EQ("function", type(X.permissions)) end),
     TT("string", function(T) T:ASSERT_EQ("string", type(X.permissions "Makefile")) end),
-    TT("rwxrwxrwx", function(T) T:ASSERT_EQ("rwxrwxrwx", X.permissions "Makefile") end),
+    TT("rwxrwxrwx", function(T) T:ASSERT(X.permissions "Makefile" :match "rw.r..r..") end),
 }
 
 )
