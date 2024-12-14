@@ -1,10 +1,10 @@
 
 -- Prepare Lua's search path so ulutest will be found.
 local bpattern={
-    ["/"]=";ulutest/?.so",
-    ["\\"]=";ulutest\\?.dll",
+    ["/"]="ulutest/?.so;",
+    ["\\"]="ulutest\\?.dll;",
 }
-package.cpath=package.cpath..(bpattern[package.config:sub(1,1)] or "")
+package.cpath=(bpattern[package.config:sub(1,1)] or "")..package.cpath
 
 local ok,X=pcall(require, "luafpp")
 
