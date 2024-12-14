@@ -75,7 +75,13 @@ ULU.RUN(
     name="filesize",
     TT("present", function(T) T:ASSERT_EQ("function", type(X.filesize)) end),
     TT("number", function(T) T:ASSERT_EQ("number", type(X.filesize "ulutest/README.md")) end),
-    TT("value", function(T) T:ASSERT_EQ(1038, X.filesize "ulutest/Makefile") end),
+    TT("value", function(T)
+        local text="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        io.output("filesize.test","b"):write(text)
+        io.close()
+        io.output(io.stdout)
+        T:ASSERT_EQ(26, X.filesize "filesize.test")
+    end),
 },
 
 {
