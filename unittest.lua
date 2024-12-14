@@ -81,6 +81,9 @@ ULU.RUN(
         io.close()
         io.output(io.stdout)
         T:ASSERT_EQ(26, X.filesize "filesize.test")
+        local a,b=os.remove "filesize.test"
+        T:ASSERT_EQ(nil,b)
+        T:ASSERT(a)
     end),
 },
 
