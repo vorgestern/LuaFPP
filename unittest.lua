@@ -96,7 +96,23 @@ ULU.RUN(
 {
     name="walkdir",
     TT("present", function(T) T:ASSERT_EQ("function", type(X.walkdir)) end),
-    TT("table", function(T) T:ASSERT_EQ("table", type(X.walkdir ".")) end),
+    TT("table", function(T) T:ASSERT_EQ("table", type(X.walkdir ".")) end)
+},
+
+{
+    name="walkdir-N",
+    TT("list", function(T)
+        T:ASSERT_EQ("table", type(X.walkdir("hier", "N")))
+        T:ASSERT_EQ(14, #X.walkdir("hier", "rN"))
+        T:ASSERT_EQ(4, #X.walkdir("hier", "N"))
+        T:ASSERT_EQ("string", type(table.concat(X.walkdir("hier", "rN"))))
+    end),
+    TT("ignore", function(T)
+        T:ASSERT(#X.walkdir("hier", "N") < #X.walkdir("hier", ".N")) -- .N finds aditional files
+    end),
+    TT("recursive", function(T)
+        T:ASSERT(#X.walkdir("hier", "N") < #X.walkdir("hier", "rN")) -- rN finds aditional files
+    end),
 },
 
 {

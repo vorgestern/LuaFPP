@@ -175,41 +175,156 @@ extern "C" int subdirs(lua_State*L)
     else return Q<<"cd requires argument (string path)">>luaerror;
 }
 
-struct fsentry { char Type; std::string name, abspath; };
-bool operator <(const fsentry&a, const fsentry&b)
-{
-    if (a.Type<b.Type) return true; else if (a.Type>b.Type) return false;
-    if (a.name<b.name) return true; else if (a.name>b.name) return true;
-    return a.abspath<b.abspath;
-}
+struct walk_opt {
+    bool show_dot {false},
+         recurse {false};
+    // bool followsym {false};
+};
 
-extern "C" int walkdir(lua_State*L)
+// =====================================================================
+
+struct fsentry { char Type; string name, catpath; };
+
+// [[maybe_unused]] static bool operator <(const fsentry&a, const fsentry&b)
+// {
+//     if (a.Type<b.Type) return true; else if (a.Type>b.Type) return false;
+//     if (a.name<b.name) return true; else if (a.name>b.name) return true;
+//     return a.catpath<b.catpath;
+// }
+
+static void walk(unsigned level, const fspath&dir, vector<fsentry>&A, const walk_opt&opt)
 {
-    LuaStack Q(L);
-    if (height(Q)<1) return Q<<"walkdir requires argument (string path)">>luaerror;
-    vector<fsentry>A {};
-    unsigned num_ignored=0;
-    const fspath root {Q.tostring(1)};
-    const bool ignore_dot=true;
-    for (const auto&entry: filesystem::directory_iterator(root))
+    // string indent(level, '\t');
+    // printf("%swalk '%s' (%lu)\n", indent.c_str(), dir.string().c_str(), A.size());
+    const auto skip=filesystem::directory_options::skip_permission_denied;
+    error_code ec;
+    for (const auto&entry: filesystem::directory_iterator(dir, skip, ec))
     {
         const auto filename=entry.path().filename().string();
-        if (ignore_dot && filename.starts_with(".")){ ++num_ignored; continue; }
-        if (entry.is_directory()) A.emplace_back('D', filename, entry.path().string());
+        // printf("%s:%s\n", indent.c_str(), filename.c_str());
+        if (!opt.show_dot && filename.starts_with(".")) continue;
+        else if (entry.is_directory())
+        {
+            A.emplace_back('D', filename, entry.path().string());
+            if (opt.recurse && level<3)
+            {
+                // printf("%srecurse into '%s'\n", indent.c_str(), entry.path().string().c_str());
+                walk(level+1, entry.path(), A, opt);
+            }
+        }
         else if (entry.is_regular_file()) A.emplace_back('F', filename, entry.path().string());
         else A.emplace_back('?', filename, entry.path().string());
     }
-    sort(A.begin(), A.end(), less<fsentry>());
+}
 
+// =====================================================================
+
+struct fshentry {
+    char Type;
+    string name, catpath;
+    vector<fshentry>content;
+};
+
+static void walk(unsigned level, const fspath&dir, vector<fshentry>&A, const walk_opt&opt)
+{
+    const auto skip=filesystem::directory_options::skip_permission_denied;
+    error_code ec;
+    for (const auto&entry: filesystem::directory_iterator(dir, skip, ec))
+    {
+        const auto filename=entry.path().filename().string();
+        if (!opt.show_dot && filename.starts_with(".")) continue;
+        else if (entry.is_directory())
+        {
+            A.emplace_back('D', filename, entry.path().string());
+            if (opt.recurse) walk(level+1, entry.path(), A.back().content, opt);
+        }
+        else if (entry.is_regular_file()) A.emplace_back('F', filename, entry.path().string());
+        else A.emplace_back('?', filename, entry.path().string());
+    }
+}
+
+static void HTable(lua_State*L, const vector<fshentry>&A) // Push one list corresponding to A
+{
+    LuaStack Q(L);
     Q<<LuaTable({0,0});
     const auto T1=Q.index(-1);
     unsigned e=0;
     for (const auto&entry: A)
     {
         Q<<LuaTable({0,2})<<string(1, entry.Type)>>LuaField("type")
-                        <<entry.name>>LuaField("name")
-                        <<entry.abspath>>LuaField("abspath")
-                        >>LuaElement({stackindex(T1), ++e});
+                          <<entry.name>>LuaField("name")
+                          <<entry.catpath>>LuaField("catpath");
+        if (entry.content.size()>0)
+        {
+            HTable(L, entry.content);
+            Q>>LuaField("content");
+        }
+        Q>>LuaElement({stackindex(T1), ++e});
+    }
+}
+
+// =====================================================================
+
+extern "C" int walkdir(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)<1) return Q<<"walkdir requires argument (string path)">>luaerror;
+    walk_opt opt;
+    char format='T';
+    if (height(Q)>1)
+    {
+        const auto opts=Q.tostring(2);
+        for (auto c: opts)
+        {
+            // printf("== %c\n", c);
+            switch (c)
+            {
+                case '.': opt.show_dot=true; break;
+                case 'r': opt.recurse=true; break;
+             // case 'l': opt.followsym=true; break;
+                case 'N': format='N'; break;          // return one string per item
+                case 'T': format='T'; break;          // return one table {type,name,path} per item
+                case 'H': format='H'; break;          // return one recursive table {type,name,path,content={...}} per item at top level
+            }
+        }
+    }
+
+    const fspath start {Q.tostring(1)};
+    switch (format)
+    {
+        case 'N':
+        {
+            vector<fsentry>A {};
+            walk(0, start, A, opt);
+            Q<<LuaTable({0,0});
+            const auto T1=Q.index(-1);
+            unsigned e=0;
+            for (const auto&entry: A) Q<<entry.catpath>>LuaElement({stackindex(T1), ++e});
+            break;
+        }
+        case 'T':
+        {
+            vector<fsentry>A {};
+            walk(0, start, A, opt);
+            Q<<LuaTable({0,0});
+            const auto T1=Q.index(-1);
+            unsigned e=0;
+            for (const auto&entry: A)
+            {
+                Q   <<LuaTable({0,2})<<string(1, entry.Type)>>LuaField("type")
+                                  <<entry.name>>LuaField("name")
+                                  <<entry.catpath>>LuaField("catpath")
+                    >>LuaElement({stackindex(T1), ++e});
+            }
+            break;
+        }
+        case 'H':
+        {
+            vector<fshentry>A {};
+            walk(0, start, A, opt);
+            HTable(L, A);
+            break;
+        }
     }
     return 1;
 }
