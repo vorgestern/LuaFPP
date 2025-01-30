@@ -69,6 +69,18 @@ ULU.RUN(
         local sep=package.config:sub(1,1)
         T:ASSERT_EQ(here..sep.."src", where)
     end),
+    TT("dir does not exist", function(T)
+        local ok,err=X.cd "hier/none"
+        T:ASSERT_NIL(ok)
+        T:ASSERT_EQ("string", type(err))
+    end),
+},
+
+{
+    name="exists",
+    TT("present", function(T) T:ASSERT_EQ("function", type(X.exists)) end),
+    TT("bool true", function(T) T:ASSERT_EQ("boolean", type(X.exists "ulutest/README.md")) end),
+    TT("file not found", function(T) T:ASSERT_NIL(X.exists("hier/none")) end)
 },
 
 {
@@ -76,12 +88,22 @@ ULU.RUN(
     TT("present", function(T) T:ASSERT_EQ("function", type(X.filesize)) end),
     TT("number", function(T) T:ASSERT_EQ("number", type(X.filesize "ulutest/README.md")) end),
     TT("value", function(T) T:ASSERT_EQ(1038, X.filesize "ulutest/Makefile") end),
+    TT("no error", function(T) local size,err=X.filesize "hier/project/Makefile"; T:ASSERT_EQ("number", type(size)); T:ASSERT_NIL(err) end),
+    TT("file not found", function(T) local size,err=X.filesize "hier/none"; T:ASSERT_NIL(size); T:ASSERT_EQ("string", type(err)) end)
 },
 
 {
     name="subdirs",
     TT("present", function(T) T:ASSERT_EQ("function", type(X.subdirs)) end),
-    TT("table", function(T) T:ASSERT_EQ("table", type(X.subdirs ".")) end),
+    TT("table", function(T)
+        T:ASSERT_EQ("table", type(X.subdirs "hier"))
+        T:ASSERT_EQ(2, #X.subdirs "hier")
+    end),
+    TT("dir does not exist", function(T)
+        local dirs,err=X.subdirs "hier/none"
+        T:ASSERT_NIL(dirs)
+        T:ASSERT_EQ("string", type(err))
+    end)
 },
 
 {
@@ -94,24 +116,24 @@ ULU.RUN(
     name="walkdir-N",
     TT("list", function(T)
         T:ASSERT_EQ("table", type(X.walkdir("hier", "N")))
-        T:ASSERT_EQ(14, #X.walkdir("hier", "rN"))
-        T:ASSERT_EQ(4, #X.walkdir("hier", "N"))
-        T:ASSERT_EQ("string", type(table.concat(X.walkdir("hier", "rN"))))
+        T:ASSERT_EQ(14, #X.walkdir("hier/project", "rN"))
+        T:ASSERT_EQ(4, #X.walkdir("hier/project", "N"))
+        T:ASSERT_EQ("string", type(table.concat(X.walkdir("hier/project", "rN"))))
     end),
     TT("ignore", function(T)
-        T:ASSERT(#X.walkdir("hier", "N") < #X.walkdir("hier", ".N")) -- .N finds aditional files
+        T:ASSERT(#X.walkdir("hier/project", "N") < #X.walkdir("hier/project", ".N")) -- .N finds aditional files
     end),
     TT("recursive", function(T)
-        T:ASSERT(#X.walkdir("hier", "N") < #X.walkdir("hier", "rN")) -- rN finds aditional files
+        T:ASSERT(#X.walkdir("hier/project", "N") < #X.walkdir("hier/project", "rN")) -- rN finds aditional files
     end),
 },
 
 {
     name="touch",
     TT("present", function(T) T:ASSERT_EQ("function", type(X.touch)) end),
-    TT("boolean", function(T) T:ASSERT_EQ("boolean", type(X.touch "Readme.md")) end),
-    TT("true", function(T) T:ASSERT_EQ(true, X.touch "Readme.md") end),
-    TT("false", function(T) T:ASSERT_EQ(false, X.touch "notpresent/,.dll") end),
+    TT("boolean", function(T) T:ASSERT_EQ("boolean", type(X.touch "hier/project/Makefile")) end),
+    TT("true", function(T) T:ASSERT_EQ(true, X.touch "hier/project/Readme.md") end),
+    TT("false", function(T) T:ASSERT_EQ(false, X.touch "hier/var/notpresent/,.dll") end),
 },
 
 {
@@ -161,7 +183,20 @@ ULU.RUN(
 
 {
     name="mkdir",
+    -- Use of setup/teardown has not been implemented yet.
+    -- However, the makefile clears hier/var before running the unittest,
+    -- so `make test` is guaranteed to work, whereas `lua unittest.lua`
+    -- might fail on repeated executions.
+    setup=function(T)
+        T:ASSERT(X.rmdir "hier/var/neu")
+    end,
     TT("present", function(T) T:ASSERT_EQ("function", type(X.mkdir)) end),
+    TT("success", function(T)
+        T:ASSERT_NIL(X.exists "hier/var/neu")
+        T:ASSERT(X.mkdir "hier/var/neu")
+        T:ASSERT_EQ(".D......", X.type "hier/var/neu")
+    end),
+    -- teardown=function(T) end
 },
 
 {
