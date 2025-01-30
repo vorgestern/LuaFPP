@@ -38,7 +38,10 @@ These do what you would expect:
     if not ok then print(err) end
     local ok,err=fpp.mkdir ".local/empty"   creates a directory
     if not ok then print(err) end
-    local ok,err=fpp.rmdir ".local/empty"   deletes (empty) directory
+    local ok,err=fpp.rmdir ".local/empty"   deletes empty directory
+    if not ok then print(err) end
+    local ok=X.rmrf ".local/various"        true if file/folder existed, false (not nil) if not
+    local ok,err=fpp.rmrf ".local/empty"    equivalent of `rm -rf`
     if not ok then print(err) end
     local dirs,err=fpp.subdirs ".local"     returns a list of subdirectories
     if not dirs then print(err)
@@ -72,3 +75,9 @@ These are more difficult to describe than to implement:
 ## Walking directories
 
     fpp.walkdir(".local", "rN", nil)
+
+# To do
+
+- Come up with a better representation of file type.
+- Introduce callbacks to filter walking recursion.
+- Introduce postprocessing utilities for output from walking directories.

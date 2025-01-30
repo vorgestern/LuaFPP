@@ -178,7 +178,7 @@ ULU.RUN(
 
 {
     name="relative",
-    TT("present", function(T) T:ASSERT_EQ("function", type(X.relative)) end),
+    TT("present", function(T) T:ASSERT_EQ("function", type(X.relative)) T:PRINTF "This test is not very useful so far" end),
 },
 
 {
@@ -220,8 +220,40 @@ ULU.RUN(
 },
 
 {
+    name="rmrf",
+    setup=function(T)
+        -- Use of setup/teardown has not been implemented yet.
+        T:ASSERT(X.mkdir "hier/var/empty")
+        T:ASSERT(X.rmdir "hier/var/neu1")
+    end,
+    TT("present", function(T) T:ASSERT_EQ("function", type(X.rmrf)) end),
+    TT("success for empty dir", function(T)
+        T:ASSERT(X.mkdir "hier/var/demo_rmrf")
+        T:ASSERT(X.rmrf "hier/var/demo_rmrf")
+    end),
+    TT("success for nonempty dir", function(T)
+        T:ASSERT_NIL(X.exists "hier/var/demo_rmrf")
+        T:ASSERT(X.mkdir "hier/var/demo_rmrf")
+        T:ASSERT(X.mkdir "hier/var/demo_rmrf/details")
+        T:ASSERT(X.rmrf "hier/var/demo_rmrf")
+    end),
+    TT("success for regular file", function(T)
+        T:ASSERT_NIL(X.exists "hier/var/demo_rmrf.txt")
+        io.output "hier/var/demo_rmrf.txt" :write "hoppla"
+        io.output()
+        T:ASSERT(X.exists "hier/var/demo_rmrf.txt")
+        T:ASSERT(X.rmrf "hier/var/demo_rmrf.txt")
+        T:ASSERT_NIL(X.exists "hier/var/demo_rmrf.txt")
+    end),
+    TT("success/false for inexistent file or folder", function(T)
+        T:ASSERT_NIL(X.exists "hier/var/demo_rmrf.txt")
+        T:ASSERT(false==X.rmrf "hier/var/demo_rmrf.txt")  -- return false if file does not exists
+    end),
+},
+
+{
     name="numlinks",
-    TT("present", function(T) T:ASSERT_EQ("function", type(X.numlinks)) end),
+    TT("present", function(T) T:ASSERT_EQ("function", type(X.numlinks)) T:PRINTF "This test is not very useful so far" end),
     TT("number", function(T) T:ASSERT_EQ("number", type(X.numlinks "Makefile")) end),
 },
 

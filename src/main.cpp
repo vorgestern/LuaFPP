@@ -381,6 +381,24 @@ extern "C" int myrmdir(lua_State*L)
     else return Q<<true, 1;
 }
 
+extern "C" int rmrf(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)<1) return Q<<"rmrf requires argument (string path)">>luaerror;
+    const fspath toremove=Q.tostring(1);
+    const auto st=filesystem::status(toremove);
+    if (!filesystem::exists(st)) return Q<<false,1;
+    error_code ec;
+    if (!filesystem::remove_all(toremove, ec) && ec.value()!=0)
+    {
+        char pad[100];
+        snprintf(pad, sizeof(pad), "system error %d for rmrf('", ec.value());
+        const string meld=pad+toremove.string()+"')";
+        return Q<<luanil<<meld, 2;
+    }
+    else return Q<<true, 1;
+}
+
 extern "C" int mytouch(lua_State*L)
 {
     LuaStack Q(L);
@@ -509,6 +527,7 @@ extern "C" LUAFPP_EXPORTS int luaopen_luafpp(lua_State*L)
         <<walkdir>>LuaField("walkdir")
         <<mymkdir>>LuaField("mkdir")
         <<myrmdir>>LuaField("rmdir")
+        <<rmrf>>LuaField("rmrf")
         <<mytouch>>LuaField("touch")
         <<mycanonical>>LuaField("canonical")
         <<myweakly_canonical>>LuaField("weakly_canonical")
