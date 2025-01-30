@@ -201,7 +201,22 @@ ULU.RUN(
 
 {
     name="rmdir",
+    setup=function(T)
+        -- Use of setup/teardown has not been implemented yet.
+        T:ASSERT(X.mkdir "hier/var/empty")
+        T:ASSERT(X.rmdir "hier/var/neu1")
+    end,
     TT("present", function(T) T:ASSERT_EQ("function", type(X.rmdir)) end),
+    TT("success", function(T)
+        T:ASSERT(X.mkdir "hier/var/empty")
+        T:ASSERT(X.rmdir "hier/var/empty")
+    end),
+    TT("fail, not empty", function(T)
+        T:ASSERT_NIL(X.exists "hier/var/neu1")
+        T:ASSERT(X.mkdir "hier/var/neu1")
+        T:ASSERT(X.mkdir "hier/var/neu1/mehr")
+        T:ASSERT_NIL(X.rmdir "hier/var/neu1")
+    end),
 },
 
 {
