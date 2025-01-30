@@ -24,7 +24,7 @@ end
 
 local TT=ULU.TT
 
-ULU.RUN(
+ULU.RUN {
 
 {
     name="version",
@@ -79,14 +79,14 @@ ULU.RUN(
 {
     name="exists",
     TT("present", function(T) T:ASSERT_EQ("function", type(X.exists)) end),
-    TT("bool true", function(T) T:ASSERT_EQ("boolean", type(X.exists "ulutest/README.md")) end),
+    TT("bool true", function(T) T:ASSERT_EQ("boolean", type(X.exists "ulutest/Readme.md")) end),
     TT("file not found", function(T) T:ASSERT_NIL(X.exists("hier/none")) end)
 },
 
 {
     name="filesize",
     TT("present", function(T) T:ASSERT_EQ("function", type(X.filesize)) end),
-    TT("number", function(T) T:ASSERT_EQ("number", type(X.filesize "ulutest/README.md")) end),
+    TT("number", function(T) T:ASSERT_EQ("number", type(X.filesize "ulutest/Readme.md")) end),
     TT("value", function(T) T:ASSERT_EQ(1038, X.filesize "ulutest/Makefile") end),
     TT("no error", function(T) local size,err=X.filesize "hier/project/Makefile"; T:ASSERT_EQ("number", type(size)); T:ASSERT_NIL(err) end),
     TT("file not found", function(T) local size,err=X.filesize "hier/none"; T:ASSERT_NIL(size); T:ASSERT_EQ("string", type(err)) end)
@@ -272,4 +272,4 @@ ULU.RUN(
     TT("rwxrwxrwx", function(T) T:ASSERT(X.permissions "Makefile" :match "rw.r..r..") end),
 }
 
-)
+}
