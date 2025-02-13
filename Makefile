@@ -12,6 +12,7 @@ clean:
 dir:
 	@mkdir -p b
 test: luafpp.so ulutest/ulutest.so
+	rm -rf hier/var/*
 	lua unittest.lua
 
 # ============================================================

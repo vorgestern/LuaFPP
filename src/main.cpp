@@ -50,6 +50,16 @@ namespace {
                     return typestring(filesystem::status(was)); // .type()
                 }
 
+extern "C" int exists(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)<1) return Q<<"exists requires argument (string path)">>luaerror;
+    const fspath was=Q.tostring(1);
+    const auto st=filesystem::status(was);
+    if (filesystem::exists(st)) return Q<<true,1;
+    else return Q<<luanil,1;
+}
+
 extern "C" int permissions(lua_State*L)
 {
     LuaStack Q(L);
@@ -153,7 +163,7 @@ extern "C" int subdirs(lua_State*L)
             if (!filesystem::exists(start))
             {
                 const string meld="subdirs: path does not exist: '"+start.string()+"'";
-                Q<<meld>>luaerror;
+                return Q<<luanil<<meld, 2;
             }
                     vector<string>subdirs;
                     for (auto const&entry: filesystem::directory_iterator{start})
@@ -163,8 +173,7 @@ extern "C" int subdirs(lua_State*L)
                             subdirs.push_back(s.string());
                         }
                     sort(subdirs.begin(), subdirs.end(), less<string>());
-                    Q<<subdirs;
-                    return 1;
+                    return Q<<subdirs, 1;
         }
         else
         {
@@ -372,6 +381,24 @@ extern "C" int myrmdir(lua_State*L)
     else return Q<<true, 1;
 }
 
+extern "C" int rmrf(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)<1) return Q<<"rmrf requires argument (string path)">>luaerror;
+    const fspath toremove=Q.tostring(1);
+    const auto st=filesystem::status(toremove);
+    if (!filesystem::exists(st)) return Q<<false,1;
+    error_code ec;
+    if (!filesystem::remove_all(toremove, ec) && ec.value()!=0)
+    {
+        char pad[100];
+        snprintf(pad, sizeof(pad), "system error %d for rmrf('", ec.value());
+        const string meld=pad+toremove.string()+"')";
+        return Q<<luanil<<meld, 2;
+    }
+    else return Q<<true, 1;
+}
+
 extern "C" int mytouch(lua_State*L)
 {
     LuaStack Q(L);
@@ -489,6 +516,7 @@ extern "C" LUAFPP_EXPORTS int luaopen_luafpp(lua_State*L)
     Q   <<LuaTable()
         <<"0.1">>LuaField("version")
         <<"https://github.com/vorgestern/LuaFPP.git">>LuaField("url")
+        <<exists>>LuaField("exists")
         <<permissions>>LuaField("permissions")
         <<type>>LuaField("type")
         <<numlinks>>LuaField("numlinks")
@@ -499,6 +527,7 @@ extern "C" LUAFPP_EXPORTS int luaopen_luafpp(lua_State*L)
         <<walkdir>>LuaField("walkdir")
         <<mymkdir>>LuaField("mkdir")
         <<myrmdir>>LuaField("rmdir")
+        <<rmrf>>LuaField("rmrf")
         <<mytouch>>LuaField("touch")
         <<mycanonical>>LuaField("canonical")
         <<myweakly_canonical>>LuaField("weakly_canonical")
