@@ -13,6 +13,7 @@
 
 - File modification
 - Follow symlinks (filesystem::read_symlink)
+- Filter return values of walkdir
 
 ## Walking callbacks
 
