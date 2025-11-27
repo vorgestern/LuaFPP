@@ -83,7 +83,7 @@ These are more difficult to describe than to implement:
     fpp.walkdir(<dir>, <opts>)      returns a table with files and folders in <dir>
                                     opts is a string with letters in random order:
                                         r  recurse
-                                        .  do not remove leading ./
+                                        .  do not skip filenames starting with '.'
                                         N|T|H (one of these) output format
                                             N a string per item (file or folder)
                                             T a table per item {name, type, catpath}
