@@ -80,18 +80,18 @@ These are more difficult to describe than to implement:
 
 ## Walking directories
 
-    fpp.walkdir(<dir>, <opts>)                  returns a table with files and folders in <dir>
-                                                opts is a string with letters in random order:
-                                                    r  recurse
-                                                    .  do not remove leading ./
-                                                    N|T|H (one of these) output format
-                                                        N a string per item (file or folder)
-                                                        T a table per item {name, type, catpath}
-                                                        H a table per item {name, type, catpath, content={..}}
-                                                opts defaults to "T"
-                                                In tables:
-                                                type is     "F"|"D"
-                                                catpath is  string representation of path starting with <dir>
+    fpp.walkdir(<dir>, <opts>)      returns a table with files and folders in <dir>
+                                    opts is a string with letters in random order:
+                                        r  recurse
+                                        .  do not remove leading ./
+                                        N|T|H (one of these) output format
+                                            N a string per item (file or folder)
+                                            T a table per item {name, type, catpath}
+                                            H a table per item {name, type, catpath, content={..}}
+                                    opts defaults to "T"
+                                    In tables:
+                                    type is     "F"|"D"
+                                    catpath is a string representation of path starting with <dir>
 
 # To do
 
