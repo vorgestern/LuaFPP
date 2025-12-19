@@ -212,17 +212,18 @@ static void walk(unsigned level, const fspath&dir, vector<fsentry>&A, const walk
         const auto filename=entry.path().filename().string();
         // printf("%s:%s\n", indent.c_str(), filename.c_str());
         if (!opt.show_dot && filename.starts_with(".")) continue;
-        else if (entry.is_directory())
+        const auto t=typestring(entry.path());
+        if (t.size()!=1) continue;
+        if (entry.is_directory())
         {
-            A.emplace_back('d', filename, entry.path().string());
+            A.emplace_back(t[0], filename, entry.path().string());
             if (opt.recurse && level<3)
             {
                 // printf("%srecurse into '%s'\n", indent.c_str(), entry.path().string().c_str());
                 walk(level+1, entry.path(), A, opt);
             }
         }
-        else if (entry.is_regular_file()) A.emplace_back('f', filename, entry.path().string());
-        else A.emplace_back('?', filename, entry.path().string());
+        else A.emplace_back(t[0], filename, entry.path().string());
     }
 }
 
