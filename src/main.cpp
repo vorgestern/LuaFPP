@@ -221,7 +221,7 @@ static void walk(unsigned level, const fspath&dir, vector<fsentry>&A, const walk
                 walk(level+1, entry.path(), A, opt);
             }
         }
-        else if (entry.is_regular_file()) A.emplace_back('d', filename, entry.path().string());
+        else if (entry.is_regular_file()) A.emplace_back('f', filename, entry.path().string());
         else A.emplace_back('?', filename, entry.path().string());
     }
 }
