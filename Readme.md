@@ -36,64 +36,73 @@ Copy to where Lua will find it with 'require luafpp'
 ## Directories
 These do what you would expect:
 
-    **fpp.pwd**()                                  returns current directory
+<pre>
+    <b>fpp.pwd</b>()                                  returns current directory
 
-    local ok,err=**fpp.cd** ".local/"              changes current directory
+    local ok,err=<b>fpp.cd</b> ".local/"              changes current directory
     if not ok then error(err) end
 
-    local ok,err=**fpp.mkdir** "demo/more/empty"   creates a directory (or hierarchy)
+    local ok,err=<b>fpp.mkdir</b> "demo/more/empty"   creates a directory (or hierarchy)
 
-    local ok,err=**fpp.rmdir** "demo/more/empty"   deletes empty directory (i.e. 'empty')
+    local ok,err=<b>fpp.rmdir</b> "demo/more/empty"   deletes empty directory (i.e. 'empty')
 
-    local ok=**fpp.rmrf** "demo"                   equivalent of `rm -rf`
+    local ok=<b>fpp.rmrf</b> "demo"                   equivalent of `rm -rf`
                                                true if file/folder existed,
                                                false (not nil) if not
 
-    local dirs,err=**fpp.subdirs** ".local"        returns a list of subdirectories
+    local dirs,err=<b>fpp.subdirs</b> ".local"        returns a list of subdirectories
     if not dirs then print(err)
     else for _,p in ipairs(dirs) do ...
     end
 
-    assert(**fpp.exists** "hier")                  Check whether directory exists (true/nil)
+    assert(<b>fpp.exists</b> "hier")                  Check whether directory exists (true/nil)
+</pre>
 
 ## Files
 These do what you would expect:
 
-    local ok,err=**fpp.touch** ".local/demo/main.cpp"           Touch/create file
+<pre>
+    local ok,err=<b>fpp.touch</b> ".local/demo/main.cpp"           Touch/create file
 
-    local s,err=**fpp.filesize** ".local/demo/main.cpp"         Query file size in bytes
+    local s,err=<b>fpp.filesize</b> ".local/demo/main.cpp"         Query file size in bytes
 
-    local p,err=**fpp.permissions** ".local/demo/main.cpp"      Query file permissions ()
+    local p,err=<b>fpp.permissions</b> ".local/demo/main.cpp"      Query file permissions ()
 
-    local l,err=**fpp.numlink** ".local/demo/main.cpp"          Query number of links ()
+    local l,err=<b>fpp.numlink</b> ".local/demo/main.cpp"          Query number of links ()
 
-    assert(**fpp.exists** ".local/demo/main.cpp")               Check whether file exists
+    assert(<b>fpp.exists</b> ".local/demo/main.cpp")               Check whether file exists
                                                             (true/nil)
+</pre>
 
 ## File-/Dir-Types
 
-    local t,err=**fpp.type** ".local/demo/main.cpp"     Query file type as a single letter.
+<pre>
+    local t,err=<b>fpp.type</b> ".local/demo/main.cpp"     Query file type as a single letter.
                                                     Uses single-letter-codes documented
                                                     in find (1) for the -type criterion:
-                                                    **b** block (buffered) special
-                                                    **c** character (unbuffered) special
-                                                    **d** directory
-                                                    **p** named pipe (FIFO)
-                                                    **f** regular file
-                                                    **l** symbolic link
-                                                    **s** socket
+                                                    <b>b</b> block (buffered) special
+                                                    <b>c</b> character (unbuffered) special
+                                                    <b>d</b> directory
+                                                    <b>p</b> named pipe (FIFO)
+                                                    <b>f</b> regular file
+                                                    <b>l</b> symbolic link
+                                                    <b>s</b> socket
+</pre>
 
 ## Paths
 These are more difficult to describe than to implement:
 
-    **fpp.absolute**
-    **fpp.relative**
-    **fpp.canonical**
-    **fpp.weakly_canonical**
+<pre>
+    <b>fpp.absolute</b>
+    <b>fpp.relative</b>
+    <b>fpp.canonical</b>
+    <b>fpp.weakly_canonical</b>
+</pre>
 
 ## Walking directories
 
-    **fpp.walkdir**(<dir>, <opts>)  returns a table with files and folders in <dir>
+<pre>
+    <b>fpp.walkdir</b>(<dir>, <opts>)  returns a table with files and folders in <dir>
                                 opts is a string with letters in random order:
                                     r  recurse
                                     .  do not skip filenames starting with '.'
@@ -105,6 +114,7 @@ These are more difficult to describe than to implement:
                                 In tables:
                                 type is     "f"|"d"
                                 catpath is a string representation of path starting with <dir>
+</pre>
 
 # To do
 
