@@ -125,7 +125,8 @@ ULU.RUN {
     name="walkdir-N",
     TT("list", function(T)
         T:ASSERT_EQ("table", type(X.walkdir("hier", "N")))
-        T:ASSERT_EQ(14, #X.walkdir("hier/project", "rN"))
+        T:ASSERT_EQ(12, #X.walkdir("hier/project", "rN"))
+        T:ASSERT_EQ(14, #X.walkdir("hier/project", ".rN"))
         T:ASSERT_EQ(4, #X.walkdir("hier/project", "N"))
         T:ASSERT_EQ("string", type(table.concat(X.walkdir("hier/project", "rN"))))
     end),
