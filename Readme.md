@@ -46,7 +46,8 @@ These do what you would expect:
     local ok,err=fpp.rmdir "demo/more/empty"   deletes empty directory (i.e. 'empty')
 
     local ok=fpp.rmrf "demo"                   equivalent of `rm -rf`
-                                               true if file/folder existed, false (not nil) if not
+                                               true if file/folder existed,
+                                               false (not nil) if not
 
     local dirs,err=fpp.subdirs ".local"        returns a list of subdirectories
     if not dirs then print(err)
@@ -62,13 +63,25 @@ These do what you would expect:
 
     local s,err=fpp.filesize ".local/demo/main.cpp"         Query file size in bytes
 
-    local t,err=fpp.type ".local/demo/main.cpp"             Query file type ("file", "dir")
-
     local p,err=fpp.permissions ".local/demo/main.cpp"      Query file permissions ()
 
     local l,err=fpp.numlink ".local/demo/main.cpp"          Query number of links ()
 
-    assert(X.exists ".local/demo/main.cpp")                 Check whether file exists (true/nil)
+    assert(X.exists ".local/demo/main.cpp")                 Check whether file exists
+                                                            (true/nil)
+
+## File-/Dir-Types
+
+    local t,err=fpp.type ".local/demo/main.cpp"     Query file type as a single letter.
+                                                    Uses single-letter-codes documented
+                                                    in find (1) for the -type criterion:
+                                                    b block (buffered) special
+                                                    c character (unbuffered) special
+                                                    d directory
+                                                    p named pipe (FIFO)
+                                                    f regular file
+                                                    l symbolic link
+                                                    s socket
 
 ## Paths
 These are more difficult to describe than to implement:
@@ -80,21 +93,24 @@ These are more difficult to describe than to implement:
 
 ## Walking directories
 
-    fpp.walkdir(<dir>, <opts>)      returns a table with files and folders in <dir>
-                                    opts is a string with letters in random order:
-                                        r  recurse
-                                        .  do not skip filenames starting with '.'
-                                        N|T|H (one of these) output format
-                                            N a string per item (file or folder)
-                                            T a table per item {name, type, catpath}
-                                            H a table per item {name, type, catpath, content={..}}
-                                    opts defaults to "T"
-                                    In tables:
-                                    type is     "F"|"D"
-                                    catpath is a string representation of path starting with <dir>
+    fpp.walkdir(<dir>, <opts>)  returns a table with files and folders in <dir>
+                                opts is a string with letters in random order:
+                                    r  recurse
+                                    .  do not skip filenames starting with '.'
+                                    N|T|H (one of these) output format
+                                        N a string per item (file or folder)
+                                        T a table per item {name, type, catpath}
+                                        H a table per item {name, type, catpath, content={..}}
+                                opts defaults to "T"
+                                In tables:
+                                type is     "f"|"d"
+                                catpath is a string representation of path starting with <dir>
 
 # To do
 
-- Come up with a better representation of file type.
-- Introduce callbacks to filter walking recursion.
-- Introduce postprocessing utilities for output from walking directories.
+    Introduce callbacks to filter walking recursion.
+    Introduce postprocessing utilities for output from walking directories.
+
+## Done
+
+    Come up with a better representation of file type.

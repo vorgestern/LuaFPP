@@ -204,7 +204,7 @@ ULU.RUN {
     TT("success", function(T)
         T:ASSERT_NIL(X.exists "hier/var/neu")
         T:ASSERT(X.mkdir "hier/var/neu")
-        T:ASSERT_EQ(".D......", X.type "hier/var/neu")
+        T:ASSERT_EQ("d", X.type "hier/var/neu")
     end),
     -- teardown=function(T) end
 },
@@ -271,8 +271,8 @@ ULU.RUN {
     name="type",
     TT("present", function(T) T:ASSERT_EQ("function", type(X.type)) end),
     TT("string", function(T) T:ASSERT_EQ("string", type(X.type "Makefile")) end),
-    TT("value F", function(T) T:ASSERT_EQ("F.......", X.type "Makefile") end),
-    TT("value D", function(T) T:ASSERT_EQ(".D......", X.type "src") end),
+    TT("value F", function(T) T:ASSERT_EQ("f", X.type "Makefile") end),
+    TT("value D", function(T) T:ASSERT_EQ("d", X.type "src") end),
 },
 
 {

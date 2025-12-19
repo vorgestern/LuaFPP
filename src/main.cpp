@@ -33,15 +33,15 @@ namespace {
 
                 string typestring(filesystem::file_status s)
                 {
-                    char pad[]="........";
-                    if (filesystem::is_regular_file(s))     pad[0]='F'; // regular file
-                    if (filesystem::is_directory(s))        pad[1]='D'; // directory
-                    if (filesystem::is_block_file(s))       pad[2]='B'; // block device
-                    if (filesystem::is_character_file(s))   pad[3]='C'; // character device
-                    if (filesystem::is_fifo(s))             pad[4]='P'; // named IPC pipe
-                    if (filesystem::is_socket(s))           pad[5]='S'; // named IPC socket
-                    if (filesystem::is_symlink(s))          pad[6]='L'; // symlink
-                    if (!filesystem::exists(s))             pad[7]='X'; // does not exist
+                    char pad[2]="\0";
+                    if (filesystem::is_regular_file(s))     pad[0]='f'; // regular file
+                    if (filesystem::is_directory(s))        pad[0]='d'; // directory
+                    if (filesystem::is_block_file(s))       pad[0]='b'; // block device
+                    if (filesystem::is_character_file(s))   pad[0]='c'; // character device
+                    if (filesystem::is_fifo(s))             pad[0]='p'; // named IPC pipe
+                    if (filesystem::is_socket(s))           pad[0]='s'; // named IPC socket
+                    if (filesystem::is_symlink(s))          pad[0]='l'; // symlink
+                    // if (!filesystem::exists(s))          pad[0]=' '; // does not exist
                     return pad;
                 }
 
@@ -214,14 +214,14 @@ static void walk(unsigned level, const fspath&dir, vector<fsentry>&A, const walk
         if (!opt.show_dot && filename.starts_with(".")) continue;
         else if (entry.is_directory())
         {
-            A.emplace_back('D', filename, entry.path().string());
+            A.emplace_back('d', filename, entry.path().string());
             if (opt.recurse && level<3)
             {
                 // printf("%srecurse into '%s'\n", indent.c_str(), entry.path().string().c_str());
                 walk(level+1, entry.path(), A, opt);
             }
         }
-        else if (entry.is_regular_file()) A.emplace_back('F', filename, entry.path().string());
+        else if (entry.is_regular_file()) A.emplace_back('d', filename, entry.path().string());
         else A.emplace_back('?', filename, entry.path().string());
     }
 }
