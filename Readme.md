@@ -102,18 +102,19 @@ These are more difficult to describe than to implement:
 ## Walking directories
 
 <pre>
-    <b>fpp.walkdir</b>(<dir>, <opts>)  returns a table with files and folders in <dir>
+    <b>fpp.walkdir</b>(&lt;dir&gt;, &lt;opts&gt;)  returns a table with files and folders in <dir>
                                 opts is a string with letters in random order:
                                     r  recurse
-                                    .  do not skip filenames starting with '.'
+                                    .  do not skip files and folders starting with '.'
                                     N|T|H (one of these) output format
                                         N a string per item (file or folder)
                                         T a table per item {name, type, catpath}
                                         H a table per item {name, type, catpath, content={..}}
                                 opts defaults to "T"
                                 In tables:
-                                type is     "f"|"d"
-                                catpath is a string representation of path starting with <dir>
+                                type is the return value of <b>fpp.type</b> on the object.
+                                catpath is a string representation of path starting with &lt;dir&gt;.
+                                content is the result of recursing into folders.
 </pre>
 
 # To do
