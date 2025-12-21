@@ -25,6 +25,8 @@ Provide source with zero config and zero #ifdef.
 # How to build
 ## Linux
 
+    git submodule init
+    git submodule update --init --recursive
     make
 
 creates luafpp.so.

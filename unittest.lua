@@ -79,14 +79,14 @@ ULU.RUN {
 {
     name="exists",
     TT("present", function(T) T:ASSERT_EQ("function", type(X.exists)) end),
-    TT("bool true", function(T) T:ASSERT_EQ("boolean", type(X.exists "ulutest/Readme.md")) end),
+    TT("bool true", function(T) T:ASSERT_EQ("boolean", type(X.exists "Readme.md")) end),
     TT("file not found", function(T) T:ASSERT_NIL(X.exists("hier/none")) end)
 },
 
 {
     name="filesize",
     TT("present", function(T) T:ASSERT_EQ("function", type(X.filesize)) end),
-    TT("number", function(T) T:ASSERT_EQ("number", type(X.filesize "ulutest/Readme.md")) end),
+    TT("number", function(T) T:ASSERT_EQ("number", type(X.filesize "Readme.md")) end),
     TT("value", function(T)
         local text="ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         io.output("filesize.test","b"):write(text)
