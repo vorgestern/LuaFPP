@@ -3,6 +3,7 @@
 #include <LuaAide.h>
 #include <filesystem>
 
+using namespace LuaAide;
 using namespace std;
 using fspath=filesystem::path;
 
@@ -125,7 +126,7 @@ extern "C" int cd(lua_State*L)
     if (height(Q)==1)
     {
         char pad[100];
-        if (Q.hasstringat(-1))
+        if (Q.hasat(LuaType::TSTRING, -1))
         {
             const fspath neu(Q.tostring(-1));
             if (!filesystem::exists(neu))
@@ -145,7 +146,7 @@ extern "C" int cd(lua_State*L)
         }
         else
         {
-            const auto meld=string("cd(path) requires path to be a string, not ")+tostring(Q.typeat(-1)).data()+".";
+            const auto meld=string("cd(path) requires path to be a string, not ")+tostringview(Q.typeat(-1)).data()+".";
             return Q<<luanil<<meld, 2;
         }
     }
@@ -157,7 +158,7 @@ extern "C" int subdirs(lua_State*L)
     LuaStack Q(L);
     if (height(Q)==1)
     {
-        if (Q.hasstringat(-1))
+        if (Q.hasat(LuaType::TSTRING, -1))
         {
             const fspath start(Q.tostring(-1));
             if (!filesystem::exists(start))
@@ -177,7 +178,7 @@ extern "C" int subdirs(lua_State*L)
         }
         else
         {
-            const auto meld=string("subdirs(path) requires path to be a string, not ")+tostring(Q.typeat(-1)).data()+".";
+            const auto meld=string("subdirs(path) requires path to be a string, not ")+tostringview(Q.typeat(-1)).data()+".";
             return Q<<meld>>luaerror;
         }
     }
@@ -515,7 +516,7 @@ extern "C" LUAFPP_EXPORTS int luaopen_luafpp(lua_State*L)
 {
     LuaStack Q(L);
     Q   <<LuaTable()
-        <<"0.1">>LuaField("version")
+        <<"0.1.1">>LuaField("version")
         <<"https://github.com/vorgestern/LuaFPP.git">>LuaField("url")
         <<exists>>LuaField("exists")
         <<permissions>>LuaField("permissions")

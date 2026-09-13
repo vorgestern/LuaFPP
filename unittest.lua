@@ -29,7 +29,7 @@ ULU.RUN {
 {
     name="version",
     TT("present", function(T) T:ASSERT_EQ("string", type(X.version)) end),
-    TT("value", function(T) T:ASSERT_EQ("0.1", X.version) end)
+    TT("value", function(T) T:ASSERT_EQ("0.1.1", X.version) end)
 },
 
 {
