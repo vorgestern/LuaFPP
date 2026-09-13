@@ -250,14 +250,17 @@ ULU.RUN {
     TT("success for regular file", function(T)
         T:ASSERT_NIL(X.exists "hier/var/demo_rmrf.txt")
         io.output "hier/var/demo_rmrf.txt" :write "hoppla"
-        io.output()
+        io.close()
+        io.output(io.stdout)
         T:ASSERT(X.exists "hier/var/demo_rmrf.txt")
-        T:ASSERT(X.rmrf "hier/var/demo_rmrf.txt")
+        local ok,err=X.rmrf "hier/var/demo_rmrf.txt"
+        T:ASSERT_NIL(err)
+        T:ASSERT(ok)
         T:ASSERT_NIL(X.exists "hier/var/demo_rmrf.txt")
     end),
     TT("success/false for inexistent file or folder", function(T)
         T:ASSERT_NIL(X.exists "hier/var/demo_rmrf.txt")
-        T:ASSERT(false==X.rmrf "hier/var/demo_rmrf.txt")  -- return false if file does not exists
+        T:ASSERT_EQ(false, X.rmrf "hier/var/demo_rmrf.txt")  -- return false if file does not exists
     end),
 },
 
