@@ -1,5 +1,5 @@
 
--- Prepare Lua's search path so ulutest will be found.
+-- Prepare Lua's search path so locally built copies of luafpp and ulutest will be found.
 local bpattern={
     ["/"]="./?.so;ulutest/?.so;",
     ["\\"]=".\\?.dll;ulutest\\?.dll;",
@@ -29,7 +29,7 @@ ULU.RUN {
 {
     name="version",
     TT("present", function(T) T:ASSERT_EQ("string", type(X.version)) end),
-    TT("value", function(T) T:ASSERT_EQ("0.1.1", X.version) end)
+    TT("value", function(T) T:ASSERT_EQ("0.1.2", X.version) end)
 },
 
 {
@@ -49,7 +49,7 @@ ULU.RUN {
         -- Prove we are reading this file.
         local result=nil -- expect 21
         for line in io.lines(X.pwd().."/unittest.lua") do
-            result=result or line:match "--expect (%d+)"
+            result=result or line:match "%-%- expect (%d+)"
             -- print(result, line)
         end
         T:ASSERT_EQ("21", result)

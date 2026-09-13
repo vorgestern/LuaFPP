@@ -2,6 +2,7 @@
 #include <lua.hpp>
 #include <LuaAide.h>
 #include <filesystem>
+#include <format>
 
 using namespace LuaAide;
 using namespace std;
@@ -84,13 +85,7 @@ extern "C" int numlinks(lua_State*L)
     const fspath was=Q.tostring(1);
     error_code ec;
     const auto nlink=hard_link_count(was, ec);
-    if (ec.value()!=0)
-    {
-        char pad[100];
-        snprintf(pad, sizeof pad, "system error %d for numlinks('", ec.value());
-        const string meld=pad+was.string()+"')";
-        return Q<<luanil<<meld, 2;
-    }
+    if (ec.value()!=0) return Q<<luanil<<format("system error {} for numlinks('{}').", ec.value(), was.string()), 2;
     else return Q<<(int)nlink, 1;
 }
 
@@ -102,13 +97,7 @@ extern "C" int filesize(lua_State*L)
     if (is_directory(was)) return Q<<0, 1;
     error_code ec;
     const auto numbytes=file_size(was, ec);
-    if (ec.value()!=0)
-    {
-        char pad[100];
-        snprintf(pad, sizeof pad, "system error %d for filesize('", ec.value());
-        const string meld=pad+was.string()+"')";
-        return Q<<luanil<<meld, 2;
-    }
+    if (ec.value()!=0) return Q<<luanil<<format("system error {} for filesize('{}').", ec.value(), was.string()), 2;
     else return Q<<(int)numbytes, 1;
 }
 
@@ -125,30 +114,16 @@ extern "C" int cd(lua_State*L)
     LuaStack Q(L);
     if (height(Q)==1)
     {
-        char pad[100];
         if (Q.hasat(LuaType::TSTRING, -1))
         {
             const fspath neu(Q.tostring(-1));
-            if (!filesystem::exists(neu))
-            {
-                const string meld="cd: path does not exist: '"+neu.string()+"'";
-                return Q<<luanil<<meld, 2;
-            }
+            if (!filesystem::exists(neu)) return Q<<luanil<<format("cd: path does not exist: '{}'", neu.string()), 2;
             error_code ec;
             current_path(neu, ec);
             if (!ec) return Q<<true, 1;
-            else
-            {
-                snprintf(pad, sizeof pad, "system error %d for cd('", ec.value());
-                const string meld=pad+neu.string()+"')";
-                return Q<<luanil<<meld, 2;
-            }
+            else return Q<<luanil<<format("system error {} for cd('{}')", ec.value(), neu.string()), 2;
         }
-        else
-        {
-            const auto meld=string("cd(path) requires path to be a string, not ")+tostringview(Q.typeat(-1)).data()+".";
-            return Q<<luanil<<meld, 2;
-        }
+        else return Q<<luanil<<format("cd(path) requires path to be a string, not {}.", tostringview(Q.typeat(-1))), 2;
     }
     else return Q<<luanil<<"cd requires argument (string path)", 2;
 }
@@ -176,11 +151,7 @@ extern "C" int subdirs(lua_State*L)
                     sort(subdirs.begin(), subdirs.end(), less<string>());
                     return Q<<subdirs, 1;
         }
-        else
-        {
-            const auto meld=string("subdirs(path) requires path to be a string, not ")+tostringview(Q.typeat(-1)).data()+".";
-            return Q<<meld>>luaerror;
-        }
+        else return Q<<format("subdirs(path) requires path to be a string, not {}.", tostringview(Q.typeat(-1)))>>luaerror;
     }
     else return Q<<"cd requires argument (string path)">>luaerror;
 }
@@ -346,13 +317,7 @@ extern "C" int mymkdir(lua_State*L)
     if (height(Q)<1) return Q<<"mkdir requires argument (string path)">>luaerror;
     const fspath neu=Q.tostring(1);
     error_code ec;
-    if (!filesystem::create_directories(neu, ec) && ec.value()!=0)
-    {
-        char pad[100];
-        snprintf(pad, sizeof(pad), "system error %d for mkdir('", ec.value());
-        const string meld=pad+neu.string()+"')";
-        return Q<<luanil<<meld, 2;
-    }
+    if (!filesystem::create_directories(neu, ec) && ec.value()!=0) return Q<<luanil<<format("system error {} for mkdir('{}').", ec.value(), neu.string()), 2;
     else return Q<<true, 1;
 }
 
@@ -364,22 +329,10 @@ extern "C" int myrmdir(lua_State*L)
     error_code ec;
     if (auto f=filesystem::is_directory(toremove, ec); !f || ec.value()!=0)
     {
-        if (!f) return Q<<luanil<<string("rmdir('"+toremove.string()+"'): not a directory."), 2;
-        else
-        {
-            char pad[100];
-            snprintf(pad, sizeof(pad), "system error %d for rmdir/is_directory('", ec.value());
-            const string meld=pad+toremove.string()+"').";
-            return Q<<luanil<<meld, 2;
-        }
+        if (!f) return Q<<luanil<<format("rmdir('{}'): not a directory.", toremove.string()), 2;
+        else    return Q<<luanil<<format("system error {} for rmdir/is_directory('{}').", ec.value(), toremove.string()), 2;
     }
-    if (!filesystem::remove(toremove, ec) && ec.value()!=0)
-    {
-        char pad[100];
-        snprintf(pad, sizeof(pad), "system error %d for rmdir('", ec.value());
-        const string meld=pad+toremove.string()+"')";
-        return Q<<luanil<<meld, 2;
-    }
+    if (!filesystem::remove(toremove, ec) && ec.value()!=0) return Q<<luanil<<format("system error {} for rmdir('{}').", ec.value(), toremove.string()), 2;
     else return Q<<true, 1;
 }
 
@@ -391,13 +344,7 @@ extern "C" int rmrf(lua_State*L)
     const auto st=filesystem::status(toremove);
     if (!filesystem::exists(st)) return Q<<false,1;
     error_code ec;
-    if (!filesystem::remove_all(toremove, ec) && ec.value()!=0)
-    {
-        char pad[100];
-        snprintf(pad, sizeof(pad), "system error %d for rmrf('", ec.value());
-        const string meld=pad+toremove.string()+"')";
-        return Q<<luanil<<meld, 2;
-    }
+    if (!filesystem::remove_all(toremove, ec) && ec.value()!=0) return Q<<luanil<<format("system error {} for rmrf('{}').", ec.value(), toremove.string()), 2;
     else return Q<<true, 1;
 }
 
@@ -409,20 +356,12 @@ extern "C" int mytouch(lua_State*L)
     error_code ec;
     if (auto f=filesystem::is_regular_file(totouch, ec); !f || ec.value()!=0)
     {
-        if (!f) return Q<<luanil<<string("touch('"+totouch.string()+"'): not a file or not a regular file."), 2;
-        else
-        {
-            char pad[100];
-            snprintf(pad, sizeof(pad), "system error %d for is_regular_file('", ec.value());
-            const string meld=pad+totouch.string()+"').";
-            return Q<<luanil<<meld, 2;
-        }
+        if (!f) return Q<<luanil<<format("touch('{}'): not a file or not a regular file.", totouch.string()), 2;
+        else    return Q<<luanil<<format("system error {} for is_regular_file('{}').", ec.value(), totouch.string()), 2;
     }
     if (filesystem::last_write_time(totouch, chrono::file_clock::now(), ec); ec.value()!=0)
     {
-        char pad[100];
-        snprintf(pad, sizeof(pad), "system error %d for touch('", ec.value());
-        const string meld=pad+totouch.string()+"').";
+        const auto meld=format("system error {} for touch('{}').", ec.value(), totouch.string());
         return Q<<luanil<<meld, 2;
     }
     return Q<<true,1;
@@ -435,14 +374,8 @@ int myabsolute(lua_State*L)
     const fspath toconvert=Q.tostring(1);
     error_code ec;
     const auto neu=filesystem::absolute(toconvert, ec);
-    if (ec.value()!=0)
-    {
-        char pad[100];
-        snprintf(pad, sizeof(pad), "system error %d for filesystem::absolute('", ec.value());
-        const string meld=pad+toconvert.string()+"').";
-        return Q<<luanil<<meld, 2;
-    }
-    return Q<<neu.string(),1;
+    if (ec.value()!=0) return Q<<luanil<<format("system error {} for filesystem::absolute('{}').", ec.value(), toconvert.string()), 2;
+    else return Q<<neu.string(),1;
 }
 
 int mycanonical(lua_State*L)
@@ -452,14 +385,8 @@ int mycanonical(lua_State*L)
     const fspath toconvert=Q.tostring(1);
     error_code ec;
     const auto neu=filesystem::canonical(toconvert, ec);
-    if (ec.value()!=0)
-    {
-        char pad[100];
-        snprintf(pad, sizeof(pad), "system error %d for filesystem::canonical('", ec.value());
-        const string meld=pad+toconvert.string()+"').";
-        return Q<<luanil<<meld, 2;
-    }
-    return Q<<neu.string(),1;
+    if (ec.value()!=0) return Q<<luanil<<format("system error {} for filesystem::canonical('{}').", ec.value(), toconvert.string()), 2;
+    else return Q<<neu.string(),1;
 }
 
 int myweakly_canonical(lua_State*L)
@@ -469,14 +396,8 @@ int myweakly_canonical(lua_State*L)
     const fspath toconvert=Q.tostring(1);
     error_code ec;
     const auto neu=filesystem::weakly_canonical(toconvert, ec);
-    if (ec.value()!=0)
-    {
-        char pad[100];
-        snprintf(pad, sizeof(pad), "system error %d for filesystem::weakly_canonical('", ec.value());
-        const string meld=pad+toconvert.string()+"').";
-        return Q<<luanil<<meld, 2;
-    }
-    return Q<<neu.string(),1;
+    if (ec.value()!=0) return Q<<luanil<<format("system error {} for filesystem::weakly_canonical('{}').", ec.value(), toconvert.string()), 2;
+    else return Q<<neu.string(),1;
 }
 
 int myrelative(lua_State*L)
@@ -490,19 +411,13 @@ int myrelative(lua_State*L)
         const fspath base=Q.tostring(2);
         const auto neu=filesystem::relative(toconvert, base, ec);
         if (ec.value()==0) return Q<<neu.string(), 1;
-        char pad[100];
-        snprintf(pad, sizeof(pad), "system error %d for filesystem::relative('", ec.value());
-        const string meld=pad+toconvert.string()+"', '"+base.string()+"').";
-        return Q<<luanil<<meld, 2;
+        else return Q<<luanil<<format("system error {} for filesystem::relative('{}', '{}').", ec.value(), toconvert.string(), base.string()), 2;
     }
     else
     {
         const auto neu=filesystem::relative(toconvert, ec);
         if (ec.value()==0) return Q<<neu.string(), 1;
-        char pad[100];
-        snprintf(pad, sizeof(pad), "system error %d for filesystem::relative('", ec.value());
-        const string meld=pad+toconvert.string()+"').";
-        return Q<<luanil<<meld, 2;
+        else return Q<<luanil<<format("system error {} for filesystem::relative('{}').", ec.value(), toconvert.string()), 2;
     }
 }
 
@@ -516,7 +431,7 @@ extern "C" LUAFPP_EXPORTS int luaopen_luafpp(lua_State*L)
 {
     LuaStack Q(L);
     Q   <<LuaTable()
-        <<"0.1.1">>LuaField("version")
+        <<"0.1.2">>LuaField("version")
         <<"https://github.com/vorgestern/LuaFPP.git">>LuaField("url")
         <<exists>>LuaField("exists")
         <<permissions>>LuaField("permissions")
