@@ -343,9 +343,29 @@ extern "C" int rmrf(lua_State*L)
     const fspath toremove=Q.tostring(1);
     const auto st=filesystem::status(toremove);
     if (!filesystem::exists(st)) return Q<<false,1;
-    error_code ec;
-    if (!filesystem::remove_all(toremove, ec) && ec.value()!=0) return Q<<luanil<<format("system error {} for rmrf('{}').", ec.value(), toremove.string()), 2;
-    else return Q<<true, 1;
+    switch (st.type())
+    {
+        case filesystem::file_type::directory:
+        {
+            error_code ec;
+            const auto num=filesystem::remove_all(toremove, ec);
+            if (num>=0) return Q<<true, 1;
+            else return Q<<luanil<<format("system error {} for rmrf('{}').", ec.value(), toremove.string()), 2;
+            break;
+        }
+        case filesystem::file_type::regular:
+        {
+            error_code ec;
+            const auto f=filesystem::remove(toremove, ec);
+            if (f) return Q<<true, 1;
+            else return Q<<luanil<<format("error {} for rmrf('{}').", ec.value(), toremove.string()), 2;
+            break;
+        }
+        default:
+        {
+            return Q<<luanil<<format("error (not a directory or regular file) for rmrf('{}').", toremove.string()), 2;
+        }
+    }
 }
 
 extern "C" int mytouch(lua_State*L)
