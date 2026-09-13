@@ -24,14 +24,22 @@
 + Lua 5.4
 
 # How to build
-## Linux
+## First ..
 
     git submodule init
     git submodule update --init --recursive
+
+## .. then on Linux
     make
 
 .. creates luafpp.so and executes unit tests.<br/>
 Copy to where Lua will find it with 'require luafpp'
+
+## .. else on Windows
+Use buildsys/VS17/luafpp.sln
+
+It might be necessary to configure access to your Lua installation
+in buildsys/VS17/Lua.props.
 
 # How to use: First ..
     fpp=require "luafpp"
