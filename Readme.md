@@ -1,7 +1,8 @@
 
-# Purpose
-Expose the functions and types of C++ std::filesystem to Lua scripts.<br/>
-Provide source with zero config and zero #ifdef.
+# Purpose & Status
+    pretty solid         Expose the functions and types of C++ std::filesystem to Lua scripts.
+    ok                   Provide source with zero config and zero #ifdef.
+                         (#ifdef for Windows DLL-export does not count.)
 
 # Examples
 
@@ -29,7 +30,7 @@ Provide source with zero config and zero #ifdef.
     git submodule update --init --recursive
     make
 
-creates luafpp.so.
+.. creates luafpp.so and executes unit tests.<br/>
 Copy to where Lua will find it with 'require luafpp'
 
 # How to use: First ..
@@ -123,7 +124,3 @@ These are more difficult to describe than to implement:
 
     Introduce callbacks to filter walking recursion.
     Introduce postprocessing utilities for output from walking directories.
-
-## Done
-
-    Come up with a better representation of file type.
