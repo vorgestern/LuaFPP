@@ -1,8 +1,8 @@
 
 -- Prepare Lua's search path so locally built copies of luafpp and ulutest will be found.
 local bpattern={
-    ["/"]="./?.so;ulutest/?.so;",
-    ["\\"]=".\\?.dll;ulutest\\?.dll;",
+    ["/"]="./?.so;LuaAide/ulutest/?.so;",
+    ["\\"]=".\\?.dll;LuaAide\\ulutest\\?.dll;",
 }
 package.cpath=(bpattern[package.config:sub(1,1)] or "")..package.cpath
 
