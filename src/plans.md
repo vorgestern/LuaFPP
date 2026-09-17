@@ -3,10 +3,9 @@
 
 ## Operations to support
 
-- Delete File
-- Copy File     (filesystem::copy_file)
-- Delete File
-- Create Symlink (filesystem::create_symlink, create_directory_symlink)
+- Copy File       (filesystem::copy_file)
+- Delete File     (os.remove)
+- Create Symlink  (filesystem::create_symlink, create_directory_symlink)
 - Create Hardlink (filesystem::create_hard_link)
 
 ## Queries

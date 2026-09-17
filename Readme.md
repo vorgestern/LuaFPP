@@ -66,7 +66,7 @@ These do what you would expect:
     else for _,p in ipairs(dirs) do ...
     end
 
-    assert(<b>fpp.exists</b> "hier")                  Check whether directory exists (true/nil)
+    assert(<b>fpp.exists</b> "testdir")               Check whether directory exists (true/nil)
 </pre>
 
 ## Files

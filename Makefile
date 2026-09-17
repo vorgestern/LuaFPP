@@ -2,20 +2,22 @@
 XFILES   := main
 CPPFLAGS := -I/usr/include/lua5.4 -I LuaAide/include
 CXXFLAGS := --std=c++20 -Wall -Werror
-.PHONY: clean dir
+.PHONY: clean dir staticlib
 
-all: dir luafpp.so LuaAide/libLuaAide.a test
+all: dir staticlib luafpp.so test
 clean:
 	@rm -rf b/* luafpp.so
 	@make -C LuaAide clean
 
 dir:
 	@mkdir -p b
-test: luafpp.so LuaAide/libLuaAide.a
-	rm -rf hier/var/*
+test: staticlib luafpp.so
 	lua unittest.lua
 
 # ============================================================
+
+staticlib:
+	make -j -C LuaAide all
 
 LuaAide/libLuaAide.a:
 	make -j -C LuaAide all
