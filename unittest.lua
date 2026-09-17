@@ -193,12 +193,8 @@ ULU.RUN {
 
 {
     name="mkdir",
-    -- Use of setup/teardown has not been implemented yet.
-    -- However, the makefile clears hier/var before running the unittest,
-    -- so `make test` is guaranteed to work, whereas `lua unittest.lua`
-    -- might fail on repeated executions.
     setup=function(T)
-        T:ASSERT(X.rmdir "hier/var/neu")
+        T:ASSERT_NOTNIL(X.rmrf "hier/var/neu") -- Accept true (deleted) or false (nothing to delete), but not nil (failure)
     end,
     TT("present", function(T) T:ASSERT_EQ("function", type(X.mkdir)) end),
     TT("success", function(T)
@@ -212,9 +208,8 @@ ULU.RUN {
 {
     name="rmdir",
     setup=function(T)
-        -- Use of setup/teardown has not been implemented yet.
         T:ASSERT(X.mkdir "hier/var/empty")
-        T:ASSERT(X.rmdir "hier/var/neu1")
+        T:ASSERT_NOTNIL(X.rmrf "hier/var/neu1")
     end,
     TT("present", function(T) T:ASSERT_EQ("function", type(X.rmdir)) end),
     TT("success", function(T)
@@ -232,9 +227,8 @@ ULU.RUN {
 {
     name="rmrf",
     setup=function(T)
-        -- Use of setup/teardown has not been implemented yet.
         T:ASSERT(X.mkdir "hier/var/empty")
-        T:ASSERT(X.rmdir "hier/var/neu1")
+        T:ASSERT(X.rmrf "hier/var/neu1")
     end,
     TT("present", function(T) T:ASSERT_EQ("function", type(X.rmrf)) end),
     TT("success for empty dir", function(T)
