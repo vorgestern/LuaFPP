@@ -50,9 +50,8 @@ int mybitor(lua_State*L)
     Q.argcheck(2, isenum, "copy_options");
     const auto a=*reinterpret_cast<co*>(lua_touserdata(L, -1));
     const auto b=*reinterpret_cast<co*>(lua_touserdata(L, -2));
-    const co result=a|b;
     Q.drop(2);
-    return pushenum(Q, result);
+    return pushenum(Q, a|b);
 }
 
 int mybitand(lua_State*L)
@@ -62,9 +61,8 @@ int mybitand(lua_State*L)
     Q.argcheck(2, isenum, "copy_options");
     const auto a=*reinterpret_cast<co*>(lua_touserdata(L, -1));
     const auto b=*reinterpret_cast<co*>(lua_touserdata(L, -2));
-    const co result=a&b;
     Q.drop(2);
-    return pushenum(Q, result);
+    return pushenum(Q, a&b);
 }
 
 int myeq(lua_State*L)
@@ -74,9 +72,8 @@ int myeq(lua_State*L)
     Q.argcheck(2, isenum, "copy_options");
     const auto a=*reinterpret_cast<co*>(lua_touserdata(L, -1));
     const auto b=*reinterpret_cast<co*>(lua_touserdata(L, -2));
-    const bool result=a==b;
     Q.drop(2);
-    Q<<result;
+    Q<<(a==b);
     return 1;
 }
 
@@ -111,11 +108,11 @@ int pushenum_copyoptions(lua_State*L)
     // Create metatable.
     Q<<newtable
         <<"copy_options">>LuaMetaMethod::name
-        <<mynumeric>>LuaField("numeric")
         <<mytostring>>LuaMetaMethod::tostring // [M, metatable]
         <<mybitor>>LuaMetaMethod::bor
         <<mybitand>>LuaMetaMethod::band
         <<myeq>>LuaMetaMethod::eq
+        <<mynumeric>>LuaField("numeric")
     ;
     mtpointer=lua_topointer(L, -1);
     Q.dup(); Q>>LuaMetaMethod::index;          // [M, metatable]
@@ -136,8 +133,8 @@ int pushenum_copyoptions(lua_State*L)
         pushenum(Q, co::create_symlinks);       Q>>LuaField("create_symlinks");
         pushenum(Q, co::create_hard_links);     Q>>LuaField("create_hard_links");
 
-        Q<<luaswap;
-        Q.drop(1);
+    Q<<luaswap;
+    Q.drop(1);
 
     return 1;
 }
