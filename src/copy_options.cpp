@@ -17,14 +17,12 @@ const void*mtpointer=nullptr; // identify metatable via lua_topointer()
 
 static int pushenum(LuaStack&Q, fs::copy_options value)
 {
-//  cout<<"pushenum A "<<Q<<"\n";
     fs::copy_options*opt=reinterpret_cast<fs::copy_options*>(lua_newuserdatauv(Q, sizeof(fs::copy_options), 0)); // [userdata]
     *opt=value;
     auto newvalue=Q.index(-1);
     Q<<LuaValue(LUA_REGISTRYINDEX)<<LuaField(mtname); // [userdata, registry, registry.mtcopy_options]
     lua_setmetatable(Q, stackindex(newvalue));        // [userdata, registry]
     Q.drop(1);                                        // [userdata]
-//  cout<<"pushenum B "<<Q<<"\n";
     return 1;
 }
 
@@ -49,7 +47,6 @@ int mynumeric(lua_State*L)
 int mybitor(lua_State*L)
 {
     LuaStack Q(L);
-//  cout<<"mybitor "<<Q<<"\n";
     Q.argcheck(1, isenum, "copy_options");
     Q.argcheck(2, isenum, "copy_options");
     const auto a=*reinterpret_cast<fs::copy_options*>(lua_touserdata(L, -1));
@@ -62,13 +59,11 @@ int mybitor(lua_State*L)
 int mybitand(lua_State*L)
 {
     LuaStack Q(L);
-//  cout<<"mybitand "<<Q<<"\n";
     Q.argcheck(1, isenum, "copy_options");
     Q.argcheck(2, isenum, "copy_options");
     const auto a=*reinterpret_cast<fs::copy_options*>(lua_touserdata(L, -1));
     const auto b=*reinterpret_cast<fs::copy_options*>(lua_touserdata(L, -2));
     const fs::copy_options result=a&b;
-//  cout<<(int)a<<" and "<<(int)b<<"="<<(int)result<<"\n";
     Q.drop(2);
     return pushenum(Q, result);
 }
@@ -76,13 +71,11 @@ int mybitand(lua_State*L)
 int myeq(lua_State*L)
 {
     LuaStack Q(L);
-//  cout<<"myeq "<<Q<<"\n";
     Q.argcheck(1, isenum, "copy_options");
     Q.argcheck(2, isenum, "copy_options");
     const auto a=*reinterpret_cast<fs::copy_options*>(lua_touserdata(L, -1));
     const auto b=*reinterpret_cast<fs::copy_options*>(lua_touserdata(L, -2));
     const bool result=a==b;
-//  cout<<(int)a<<"=="<<(int)b<<"=>"<<result<<"\n";
     Q.drop(2);
     Q<<result;
     return 1;
@@ -116,8 +109,6 @@ int pushenum_copyoptions(lua_State*L)
     LuaStack Q=L;
     auto M=Q.index(-1);
 
-//  cout<<"aa "<<Q<<"\n";
-
     // Create metatable.
     Q<<newtable
         <<"copy_options">>LuaMetaMethod::name
@@ -134,8 +125,6 @@ int pushenum_copyoptions(lua_State*L)
     Q<<LuaValue(LUA_REGISTRYINDEX)<<mt>>LuaField(mtname);
     Q.drop(1);
 
-//  cout<<"bb "<<Q<<"\n";
-
     Q<<LuaTable();                              // [M, metatable, E]
         pushenum(Q, co::none);                  Q>>LuaField("none");
         pushenum(Q, co::skip_existing);         Q>>LuaField("skip_existing");
@@ -151,6 +140,5 @@ int pushenum_copyoptions(lua_State*L)
         Q<<luaswap;
         Q.drop(1);
 
-//  cout<<"zz "<<Q<<"\n";
     return 1;
 }
