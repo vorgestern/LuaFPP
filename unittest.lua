@@ -277,6 +277,36 @@ ULU.RUN {
     TT("present", function(T) T:ASSERT_EQ("function", type(X.permissions)) end),
     TT("string", function(T) T:ASSERT_EQ("string", type(X.permissions "Makefile")) end),
     TT("rwxrwxrwx", function(T) T:ASSERT(X.permissions "Makefile" :match "rw.r..r..") end),
-}
+},
+
+{
+    name="copy_options",
+    TT("present", function(T) T:ASSERT_EQ("table", type(X.copy_options)) end),
+    TT("expected_values", function(T)
+        for k,e in ipairs {"none", "skip_existing", "overwrite_existing", "update_existing", "recursive",
+            "copy_symlinks", "skip_symlinks", "directories_only", "create_symlinks","create_hard_links"} do
+                T:EXPECT_EQ("userdata", type(X.copy_options[e]))
+        end
+    end),
+    TT("string representation", function(T)
+        for k,e in ipairs {"none", "skip_existing", "overwrite_existing", "update_existing", "recursive",
+            "copy_symlinks", "skip_symlinks", "directories_only", "create_symlinks","create_hard_links"} do
+                T:EXPECT_EQ(e, tostring(X.copy_options[e]))
+        end
+    end),
+    TT("numeric", function(T)
+        for k,e in ipairs {"none", "skip_existing", "overwrite_existing", "update_existing", "recursive",
+            "copy_symlinks", "skip_symlinks", "directories_only", "create_symlinks","create_hard_links"} do
+                T:EXPECT_EQ("number", type(X.copy_options[e]:numeric()))
+        end
+    end),
+    TT("has_bitops", function(T)
+        local co=X.copy_options
+        local optneu=co.skip_existing | co.recursive;
+        T:ASSERT_EQ("userdata", type(optneu))
+        T:ASSERT_EQ(co.recursive, optneu & co.recursive)
+        T:ASSERT_EQ(co.skip_existing, optneu & co.skip_existing)
+    end),
+},
 
 }

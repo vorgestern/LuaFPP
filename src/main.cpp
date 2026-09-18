@@ -443,6 +443,8 @@ int myrelative(lua_State*L)
 
 } // anon
 
+int pushenum_copyoptions(lua_State*); // Push a table with a uservalue for each value of filesystem::copy_options.
+
 #ifndef LUAFPP_EXPORTS
 #define LUAFPP_EXPORTS
 #endif
@@ -470,5 +472,8 @@ extern "C" LUAFPP_EXPORTS int luaopen_luafpp(lua_State*L)
         <<myweakly_canonical>>LuaField("weakly_canonical")
         <<myrelative>>LuaField("relative")
         <<myabsolute>>LuaField("absolute");
+
+    pushenum_copyoptions(Q); Q>>LuaField("copy_options");
+
     return 1;
 }

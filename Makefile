@@ -1,7 +1,8 @@
 
-XFILES   := main
+XFILES   := main copy_options
 CPPFLAGS := -I/usr/include/lua5.4 -I LuaAide/include
-CXXFLAGS := --std=c++20 -Wall -Werror
+CXXFLAGS := --std=c++20
+# CXXFLAGS += -Wall -Werror
 .PHONY: clean dir staticlib
 
 all: dir staticlib luafpp.so test
@@ -27,8 +28,8 @@ ulutest/ulutest.so:
 
 # ============================================================
 
-luafpp.so: b/main.o LuaAide/libLuaAide.a
+luafpp.so: $(XFILES:%=b/%.o) LuaAide/libLuaAide.a
 	g++ -shared -fpic -o $@ $^
 
 b/%.o: src/%.cpp LuaAide/include/LuaAide.h
-	g++ -c -Wall -Werror -fpic -o $@ $< $(CPPFLAGS) $(CXXFLAGS)
+	g++ -c -fpic -o $@ $< $(CPPFLAGS) $(CXXFLAGS)
