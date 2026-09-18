@@ -11,3 +11,5 @@ buildsys/VS17/Release
 buildsys/VS17/packages
 
 .vscode
+.cache
+compile_commands.json

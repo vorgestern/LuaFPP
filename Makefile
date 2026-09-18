@@ -33,3 +33,7 @@ luafpp.so: $(XFILES:%=b/%.o) LuaAide/libLuaAide.a
 
 b/%.o: src/%.cpp LuaAide/include/LuaAide.h
 	g++ -c -fpic -o $@ $< $(CPPFLAGS) $(CXXFLAGS)
+
+lsp:
+	@ make clean
+	@ bear -- make luafpp.so
