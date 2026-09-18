@@ -7,17 +7,16 @@
 using namespace std;
 using namespace LuaAide;
 
-namespace fs=std::filesystem;
-using co=fs::copy_options;
+using co=std::filesystem::copy_options;
 
 namespace {
 
 const auto mtname="mtcopy_options";
 const void*mtpointer=nullptr; // identify metatable via lua_topointer()
 
-static int pushenum(LuaStack&Q, fs::copy_options value)
+static int pushenum(LuaStack&Q, co value)
 {
-    fs::copy_options*opt=reinterpret_cast<fs::copy_options*>(lua_newuserdatauv(Q, sizeof(fs::copy_options), 0)); // [userdata]
+    co*opt=reinterpret_cast<co*>(lua_newuserdatauv(Q, sizeof(co), 0)); // [userdata]
     *opt=value;
     auto newvalue=Q.index(-1);
     Q<<LuaValue(LUA_REGISTRYINDEX)<<LuaField(mtname); // [userdata, registry, registry.mtcopy_options]
@@ -40,7 +39,7 @@ int mynumeric(lua_State*L)
 {
     LuaStack Q(L);
     Q.argcheck(1, isenum, "copy_options");
-    const auto value=*reinterpret_cast<fs::copy_options*>(lua_touserdata(L, -1));
+    const auto value=*reinterpret_cast<co*>(lua_touserdata(L, -1));
     return Q<<(int)value, 1;
 }
 
@@ -49,9 +48,9 @@ int mybitor(lua_State*L)
     LuaStack Q(L);
     Q.argcheck(1, isenum, "copy_options");
     Q.argcheck(2, isenum, "copy_options");
-    const auto a=*reinterpret_cast<fs::copy_options*>(lua_touserdata(L, -1));
-    const auto b=*reinterpret_cast<fs::copy_options*>(lua_touserdata(L, -2));
-    const fs::copy_options result=a|b;
+    const auto a=*reinterpret_cast<co*>(lua_touserdata(L, -1));
+    const auto b=*reinterpret_cast<co*>(lua_touserdata(L, -2));
+    const co result=a|b;
     Q.drop(2);
     return pushenum(Q, result);
 }
@@ -61,9 +60,9 @@ int mybitand(lua_State*L)
     LuaStack Q(L);
     Q.argcheck(1, isenum, "copy_options");
     Q.argcheck(2, isenum, "copy_options");
-    const auto a=*reinterpret_cast<fs::copy_options*>(lua_touserdata(L, -1));
-    const auto b=*reinterpret_cast<fs::copy_options*>(lua_touserdata(L, -2));
-    const fs::copy_options result=a&b;
+    const auto a=*reinterpret_cast<co*>(lua_touserdata(L, -1));
+    const auto b=*reinterpret_cast<co*>(lua_touserdata(L, -2));
+    const co result=a&b;
     Q.drop(2);
     return pushenum(Q, result);
 }
@@ -73,8 +72,8 @@ int myeq(lua_State*L)
     LuaStack Q(L);
     Q.argcheck(1, isenum, "copy_options");
     Q.argcheck(2, isenum, "copy_options");
-    const auto a=*reinterpret_cast<fs::copy_options*>(lua_touserdata(L, -1));
-    const auto b=*reinterpret_cast<fs::copy_options*>(lua_touserdata(L, -2));
+    const auto a=*reinterpret_cast<co*>(lua_touserdata(L, -1));
+    const auto b=*reinterpret_cast<co*>(lua_touserdata(L, -2));
     const bool result=a==b;
     Q.drop(2);
     Q<<result;
@@ -85,19 +84,19 @@ int mytostring(lua_State*L)
 {
     LuaStack Q(L);
     Q.argcheck(1, isenum, "copy_options");
-    const auto value=*reinterpret_cast<fs::copy_options*>(lua_touserdata(L, -1));
+    const auto value=*reinterpret_cast<co*>(lua_touserdata(L, -1));
     switch (value)
     {
-        case fs::copy_options::none: return Q<<"none", 1;
-        case fs::copy_options::skip_existing: return Q<<"skip_existing", 1;
-        case fs::copy_options::overwrite_existing: return Q<<"overwrite_existing", 1;
-        case fs::copy_options::update_existing: return Q<<"update_existing", 1;
-        case fs::copy_options::recursive: return Q<<"recursive", 1;
-        case fs::copy_options::copy_symlinks: return Q<<"copy_symlinks", 1;
-        case fs::copy_options::skip_symlinks: return Q<<"skip_symlinks", 1;
-        case fs::copy_options::directories_only: return Q<<"directories_only", 1;
-        case fs::copy_options::create_symlinks: return Q<<"create_symlinks", 1;
-        case fs::copy_options::create_hard_links: return Q<<"create_hard_links", 1;
+        case co::none: return Q<<"none", 1;
+        case co::skip_existing: return Q<<"skip_existing", 1;
+        case co::overwrite_existing: return Q<<"overwrite_existing", 1;
+        case co::update_existing: return Q<<"update_existing", 1;
+        case co::recursive: return Q<<"recursive", 1;
+        case co::copy_symlinks: return Q<<"copy_symlinks", 1;
+        case co::skip_symlinks: return Q<<"skip_symlinks", 1;
+        case co::directories_only: return Q<<"directories_only", 1;
+        case co::create_symlinks: return Q<<"create_symlinks", 1;
+        case co::create_hard_links: return Q<<"create_hard_links", 1;
         default: return Q<<"<unknown>", 1;
     }
 }
