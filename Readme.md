@@ -79,10 +79,17 @@ These do what you would expect:
 
     local p,err=<b>fpp.permissions</b> ".local/demo/main.cpp"      Query file permissions ()
 
-    local l,err=<b>fpp.numlink</b> ".local/demo/main.cpp"          Query number of links ()
+    local l,err=<b>fpp.numlinks</b> ".local/demo/main.cpp"         Query number of links ()
 
     assert(<b>fpp.exists</b> ".local/demo/main.cpp")               Check whether file exists
                                                             (true/nil)
+
+    local source,target=
+        "testdir/project/Readme.md",
+        "testdir/var/Readme.md"
+    local ok,err=<b>fpp.copy_file</b>(source, target)                                          Copy file, fail if target exists
+
+    local ok,err=<b>fpp.copy_file</b>(source, target, fpp.copy_options.overwrite_existing)     Copy file, overwrite if target exists
 </pre>
 
 ## File-/Dir-Types
