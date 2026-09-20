@@ -35,7 +35,7 @@ ULU.RUN {
 
 TCASE "version" {
     TT("present", function(T) T:ASSERT_EQ("string", type(X.version)) end),
-    TT("value", function(T) T:ASSERT_EQ("0.1.3", X.version) end)
+    TT("value", function(T) T:ASSERT_EQ("0.2", X.version) end)
 },
 
 TCASE "url" {
