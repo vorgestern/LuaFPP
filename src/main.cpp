@@ -8,6 +8,10 @@ using namespace LuaAide;
 using namespace std;
 using fspath=filesystem::path;
 
+using co=filesystem::copy_options;
+co argcheck_copy_options(LuaStack&Q, int arg);
+string tostring(co);
+
 namespace {
 
                 string permstring(const fspath&was)
@@ -441,6 +445,27 @@ int myrelative(lua_State*L)
     }
 }
 
+int mycopyfile(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)<2) return Q<<"copy_file requires at least two arguments (string path from, to; copy_options=none)">>luaerror;
+    const fspath from=Q.tostring(1), to=Q.tostring(2);
+    error_code ec;
+    if (height(Q)>2)
+    {
+        auto opt=argcheck_copy_options(Q, 3);
+        const auto flag=filesystem::copy_file(from, to, opt, ec);
+        if (ec.value()==0) return Q<<flag, 1;
+        else return Q<<luanil<<format("system error {} for filesystem::copy_file('{}', '{}', '{}').", ec.value(), from.string(), to.string(), "opt"), 2;
+    }
+    else
+    {
+        const auto flag=filesystem::copy_file(from, to, ec);
+        if (ec.value()==0) return Q<<flag, 1;
+        else return Q<<luanil<<format("system error {} for filesystem::copy_file('{}', '{}').", ec.value(), from.string(), to.string()), 2;
+    }
+}
+
 } // anon
 
 int pushenum_copyoptions(lua_State*); // Push a table with a uservalue for each value of filesystem::copy_options.
@@ -471,7 +496,8 @@ extern "C" LUAFPP_EXPORTS int luaopen_luafpp(lua_State*L)
         <<mycanonical>>LuaField("canonical")
         <<myweakly_canonical>>LuaField("weakly_canonical")
         <<myrelative>>LuaField("relative")
-        <<myabsolute>>LuaField("absolute");
+        <<myabsolute>>LuaField("absolute")
+        <<mycopyfile>>LuaField("copy_file");
 
     pushenum_copyoptions(Q); Q>>LuaField("copy_options");
 

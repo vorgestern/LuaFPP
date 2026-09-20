@@ -9,6 +9,28 @@ using namespace LuaAide;
 
 using co=std::filesystem::copy_options;
 
+string tostring(co opt)
+{
+    const array<co,10> opts={
+                           co::skip_existing, co::overwrite_existing, co::update_existing, co::recursive,
+        co::copy_symlinks, co::skip_symlinks, co::directories_only,   co::create_symlinks, co::create_hard_links};
+    const array<string_view,10> optstr={
+                           "skip_existing",   "overwrite_existing",   "update_existing",   "recursive",
+        "copy_symlinks",   "skip_symlinks",   "directories_only",     "create_symlinks",   "create_hard_links"};
+    string result="", sep="";
+    for (auto j=0; j<opts.size(); ++j)
+    {
+        if ((opt & opts[j])!=co::none)
+        {
+            result+=sep;
+            result+=optstr[j];
+            sep="|";
+        }
+    };
+    if (result.size()==0) return "none";
+    else return result;
+}
+
 namespace {
 
 const auto mtname="mtcopy_options";
@@ -82,20 +104,7 @@ int mytostring(lua_State*L)
     LuaStack Q(L);
     Q.argcheck(1, isenum, "copy_options");
     const auto value=*reinterpret_cast<co*>(lua_touserdata(L, -1));
-    switch (value)
-    {
-        case co::none: return Q<<"none", 1;
-        case co::skip_existing: return Q<<"skip_existing", 1;
-        case co::overwrite_existing: return Q<<"overwrite_existing", 1;
-        case co::update_existing: return Q<<"update_existing", 1;
-        case co::recursive: return Q<<"recursive", 1;
-        case co::copy_symlinks: return Q<<"copy_symlinks", 1;
-        case co::skip_symlinks: return Q<<"skip_symlinks", 1;
-        case co::directories_only: return Q<<"directories_only", 1;
-        case co::create_symlinks: return Q<<"create_symlinks", 1;
-        case co::create_hard_links: return Q<<"create_hard_links", 1;
-        default: return Q<<"<unknown>", 1;
-    }
+    return Q<<tostring(value), 1;
 }
 
 } // anon
@@ -135,4 +144,11 @@ int pushenum_copyoptions(lua_State*L)
     Q<<luaswap<<luadrop;
 
     return 1;
+}
+
+co argcheck_copy_options(LuaStack&Q, int arg)
+{
+    Q.argcheck(arg, isenum, "copy_options");
+    const auto value=*reinterpret_cast<co*>(lua_touserdata(Q, arg));
+    return value;
 }

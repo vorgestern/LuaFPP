@@ -123,8 +123,8 @@ TCASE "subdirs" {
 TCASE "walkdir-N" {
     TT("list", function(T)
         T:ASSERT_EQ("table", type(X.walkdir("testdir", "N")))
-        T:ASSERT_EQ(12, #X.walkdir("testdir/project", "rN"))
-        T:ASSERT_EQ(14, #X.walkdir("testdir/project", ".rN"))
+        T:ASSERT_EQ(13, #X.walkdir("testdir/project", "rN"))
+        T:ASSERT_EQ(15, #X.walkdir("testdir/project", ".rN"))
         T:ASSERT_EQ(4, #X.walkdir("testdir/project", "N"))
         T:ASSERT_EQ("string", type(table.concat(X.walkdir("testdir/project", "rN"))))
     end),
@@ -279,11 +279,39 @@ TCASE "copy_options" {
             "copy_symlinks", "skip_symlinks", "directories_only", "create_symlinks","create_hard_links"} do
                 T:EXPECT_EQ(e, tostring(X.copy_options[e]))
         end
+        T:EXPECT_EQ("overwrite_existing|recursive", tostring(X.copy_options.overwrite_existing | X.copy_options.recursive))
+    end),
+    TT("string representation (or'd)", function(T)
+        local co=X.copy_options
+        local K={"skip_existing", "overwrite_existing", "update_existing", "recursive",
+            "copy_symlinks", "skip_symlinks", "directories_only", "create_symlinks","create_hard_links"}
+        for j1=1,#K do
+            local k1=K[j1]
+            T:ASSERT_EQ(tostring(co[k1]), tostring(co[k1] | co[k1]))
+            for j2=j1+1,#K do
+                local k2=K[j2]
+                T:ASSERT_EQ(k1.."|"..k2, tostring(co[k1] | co[k2]))
+            end
+        end
+        T:EXPECT_EQ("overwrite_existing|recursive", tostring(X.copy_options.overwrite_existing | X.copy_options.recursive))
     end),
     TT("numeric", function(T)
         for k,e in ipairs {"none", "skip_existing", "overwrite_existing", "update_existing", "recursive",
             "copy_symlinks", "skip_symlinks", "directories_only", "create_symlinks","create_hard_links"} do
                 T:EXPECT_EQ("number", type(X.copy_options[e]:numeric()))
+        end
+    end),
+    TT("numeric (or'd)", function(T)
+        local co=X.copy_options
+        local K={"skip_existing", "overwrite_existing", "update_existing", "recursive",
+            "copy_symlinks", "skip_symlinks", "directories_only", "create_symlinks","create_hard_links"}
+        for j1=1,#K do
+            local opt1=co[K[j1]]
+            T:ASSERT_EQ(opt1:numeric(), (opt1|opt1):numeric())
+            for j2=j1+1,#K do
+                local opt2=co[K[j2]]
+                T:ASSERT_EQ(opt1:numeric()|opt2:numeric(), (opt1|opt2):numeric())
+            end
         end
     end),
     TT("has_bitops", function(T)
@@ -293,6 +321,26 @@ TCASE "copy_options" {
         T:ASSERT_EQ(co.recursive, optneu & co.recursive)
         T:ASSERT_EQ(co.skip_existing, optneu & co.skip_existing)
     end),
+},
+
+TCASE "copy_file" {
+    setup=function(T)
+        T:ASSERT(X.exists "testdir/project/Readme.md")
+        os.remove "testdir/var/Readme.md"
+    end,
+    TT("existing", function(T)
+        T:ASSERT(X.copy_file("testdir/project/Readme.md", "testdir/var/Readme.md"))
+    end),
+    TT("nooverwrite", function(T)
+        T:ASSERT_NIL(X.copy_file("testdir/project/hiersrc/Readme.md", "testdir/var/Readme.md"))
+    end),
+    TT("allow_overwrite", function(T)
+        T:ASSERT(X.copy_file("testdir/project/hiersrc/App1/Readme.md", "testdir/var/Readme.md", X.copy_options.overwrite_existing))
+    end),
+    teardown=function(T)
+        T:ASSERT(X.exists "testdir/var/Readme.md")
+        os.remove "testdir/var/Readme.md"
+    end,
 },
 
 }
