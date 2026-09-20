@@ -68,11 +68,15 @@ These do what you would expect:
 
     assert(<b>fpp.exists</b> "testdir")               Check whether directory exists (true/nil)
 
-    local ok,err=fpp.copy("testdir/project/hiersrc/", "testdir/var/copiedsrc/", fpp.copy_options.recursive)   Copy folder recursively, fail if target exists.
+    local ok,err=fpp.copy("testdir/project/hiersrc/",
+        "testdir/var/copiedsrc/",
+        fpp.copy_options.recursive)                   Copy folder recursively, fail if target exists.
+                                                      fpp.copy handles both files and folders.
 
-    local ok,err=fpp.copy("testdir/project/hiersrc/", "testdir/var/copiedsrc/",
-        fpp.copy_options.recursive | fpp.copy_options.overwrite_existing)                                     Copy folder recursively, overwrite if target exists.
-                                                                                                              fpp.copy handles both files and folders.
+    local ok,err=fpp.copy("testdir/project/hiersrc/",
+        "testdir/var/copiedsrc/",
+        fpp.copy_options.recursive|
+        fpp.copy_options.overwrite_existing)          Copy folder recursively, overwrite if target exists.
 </pre>
 
 ## Files
@@ -93,9 +97,10 @@ These do what you would expect:
     local source,target=
         "testdir/project/Readme.md",
         "testdir/var/Readme.md"
-    local ok,err=<b>fpp.copy_file</b>(source, target)                                          Copy file, fail if target exists
+    local ok,err=<b>fpp.copy_file</b>(source, target)              Copy file, fail if target exists
 
-    local ok,err=<b>fpp.copy_file</b>(source, target, fpp.copy_options.overwrite_existing)     Copy file, overwrite if target exists
+    local ok,err=<b>fpp.copy_file</b>(source, target,
+        fpp.copy_options.overwrite_existing)                Copy file, overwrite if target exists
 </pre>
 
 ## File-/Dir-Types
