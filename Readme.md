@@ -70,13 +70,13 @@ These do what you would expect:
 
     local ok,err=fpp.copy("testdir/project/hiersrc/",
         "testdir/var/copiedsrc/",
-        fpp.copy_options.recursive)                   Copy folder recursively, fail if target exists.
-                                                      fpp.copy handles both files and folders.
+        fpp.copy_options.recursive)                 Copy folder recursively, fail if target exists.
+                                                    fpp.copy handles both files and folders.
 
     local ok,err=fpp.copy("testdir/project/hiersrc/",
         "testdir/var/copiedsrc/",
-        fpp.copy_options.recursive|
-        fpp.copy_options.overwrite_existing)          Copy folder recursively, overwrite if target exists.
+        fpp.copy_options.recursive|                 Copy folder recursively,
+        fpp.copy_options.overwrite_existing)        overwrite if target exists.
 </pre>
 
 ## Files
@@ -131,7 +131,7 @@ These are more difficult to describe than to implement:
 ## Walking directories
 
 <pre>
-    <b>fpp.walkdir</b>(&lt;dir&gt;, &lt;opts&gt;)  returns a table with files and folders in <dir>
+    <b>fpp.walkdir</b>(&lt;dir&gt;, &lt;opts&gt;)  returns a table with files and folders in &lt;dir&gt;
                                 opts is a string with letters in random order:
                                     r  recurse
                                     .  do not skip files and folders starting with '.'
