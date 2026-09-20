@@ -24,22 +24,26 @@ end
 
 local TT=ULU.TT
 
+local TCASE=function(name)
+    return function(tests)
+        tests.name=name
+        return tests
+    end
+end
+
 ULU.RUN {
 
-{
-    name="version",
+TCASE "version" {
     TT("present", function(T) T:ASSERT_EQ("string", type(X.version)) end),
     TT("value", function(T) T:ASSERT_EQ("0.1.3", X.version) end)
 },
 
-{
-    name="url",
+TCASE "url" {
     TT("present", function(T) T:ASSERT_EQ("string", type(X.url)) end),
     TT("value", function(T) T:ASSERT_EQ("https://github.com/vorgestern/LuaFPP.git", X.url) end)
 },
 
-{
-    name="pwd",
+TCASE "pwd" {
     TT("present", function(T) T:ASSERT_EQ("function", type(X.pwd)) end),
     TT("string", function(T) T:ASSERT_EQ("string", type(X.pwd())) end),
     TT("usable", function(T)
@@ -56,8 +60,7 @@ ULU.RUN {
     end),
 },
 
-{
-    name="cd",
+TCASE "cd" {
     TT("present", function(T) T:ASSERT_EQ("function", type(X.cd)) end),
     TT("void", function(T) T:ASSERT_EQ("nil", type(X.cd())) end),
     TT("usable", function(T)
@@ -76,15 +79,13 @@ ULU.RUN {
     end),
 },
 
-{
-    name="exists",
+TCASE "exists" {
     TT("present", function(T) T:ASSERT_EQ("function", type(X.exists)) end),
     TT("bool true", function(T) T:ASSERT_EQ("boolean", type(X.exists "Readme.md")) end),
     TT("file not found", function(T) T:ASSERT_NIL(X.exists("testdir/none")) end)
 },
 
-{
-    name="filesize",
+TCASE "filesize" {
     TT("present", function(T) T:ASSERT_EQ("function", type(X.filesize)) end),
     TT("number", function(T) T:ASSERT_EQ("number", type(X.filesize "Readme.md")) end),
     TT("value", function(T)
@@ -101,8 +102,7 @@ ULU.RUN {
     TT("file not found", function(T) local size,err=X.filesize "testdir/none"; T:ASSERT_NIL(size); T:ASSERT_EQ("string", type(err)) end)
 },
 
-{
-    name="subdirs",
+TCASE "subdirs" {
     TT("present", function(T) T:ASSERT_EQ("function", type(X.subdirs)) end),
     TT("table", function(T)
         T:ASSERT_EQ("table", type(X.subdirs "testdir"))
@@ -115,14 +115,12 @@ ULU.RUN {
     end)
 },
 
-{
-    name="walkdir",
+ TCASE "walkdir" {
     TT("present", function(T) T:ASSERT_EQ("function", type(X.walkdir)) end),
     TT("table", function(T) T:ASSERT_EQ("table", type(X.walkdir ".")) end)
 },
 
-{
-    name="walkdir-N",
+TCASE "walkdir-N" {
     TT("list", function(T)
         T:ASSERT_EQ("table", type(X.walkdir("testdir", "N")))
         T:ASSERT_EQ(12, #X.walkdir("testdir/project", "rN"))
@@ -138,16 +136,14 @@ ULU.RUN {
     end),
 },
 
-{
-    name="touch",
+TCASE "touch" {
     TT("present", function(T) T:ASSERT_EQ("function", type(X.touch)) end),
     TT("boolean", function(T) T:ASSERT_EQ("boolean", type(X.touch "testdir/project/Makefile")) end),
     TT("true", function(T) T:ASSERT_EQ(true, X.touch "testdir/project/Readme.md") end),
     TT("false", function(T) T:ASSERT_EQ(false, X.touch "testdir/var/notpresent/,.dll") end),
 },
 
-{
-    name="absolute",
+TCASE "absolute" {
     TT("present", function(T) T:ASSERT_EQ("function", type(X.absolute)) end),
     TT("string", function(T) T:ASSERT_EQ("string", type(X.absolute ".")) end),
     -- Cannot come up with a scenario that will fail.
@@ -158,8 +154,7 @@ ULU.RUN {
     end),
 },
 
-{
-    name="canonical",
+TCASE "canonical" {
     TT("present", function(T) T:ASSERT_EQ("function", type(X.canonical)) end),
     TT("string", function(T) T:ASSERT_EQ("string", type(X.canonical ".")) end),
     TT("removedotdot", function(T)
@@ -172,8 +167,7 @@ ULU.RUN {
     -- TT("removesepdotsep", ..)
 },
 
-{
-    name="weakly_canonical",
+TCASE "weakly_canonical" {
     TT("present", function(T) T:ASSERT_EQ("function", type(X.weakly_canonical)) end),
     TT("string", function(T) T:ASSERT_EQ("string", type(X.weakly_canonical ".")) end),
     TT("removedotdot", function(T)
@@ -186,13 +180,11 @@ ULU.RUN {
     -- TT("removesepdotsep", ..)
 },
 
-{
-    name="relative",
+TCASE "relative" {
     TT("present", function(T) T:ASSERT_EQ("function", type(X.relative)) T:PRINTF "This test is not very useful so far" end),
 },
 
-{
-    name="mkdir",
+TCASE "mkdir" {
     setup=function(T)
         T:ASSERT_NOTNIL(X.rmrf "testdir/var/neu") -- Accept true (deleted) or false (nothing to delete), but not nil (failure)
     end,
@@ -205,8 +197,7 @@ ULU.RUN {
     -- teardown=function(T) end
 },
 
-{
-    name="rmdir",
+TCASE "rmdir" {
     setup=function(T)
         T:ASSERT(X.mkdir "testdir/var/empty")
         T:ASSERT_NOTNIL(X.rmrf "testdir/var/neu1")
@@ -224,8 +215,7 @@ ULU.RUN {
     end),
 },
 
-{
-    name="rmrf",
+TCASE "rmrf" {
     setup=function(T)
         T:ASSERT(X.mkdir "testdir/var/empty")
         T:ASSERT(X.rmrf "testdir/var/neu1")
@@ -258,29 +248,25 @@ ULU.RUN {
     end),
 },
 
-{
-    name="numlinks",
+TCASE "numlinks" {
     TT("present", function(T) T:ASSERT_EQ("function", type(X.numlinks)) T:PRINTF "This test is not very useful so far" end),
     TT("number", function(T) T:ASSERT_EQ("number", type(X.numlinks "Makefile")) end),
 },
 
-{
-    name="type",
+TCASE "type" {
     TT("present", function(T) T:ASSERT_EQ("function", type(X.type)) end),
     TT("string", function(T) T:ASSERT_EQ("string", type(X.type "Makefile")) end),
     TT("value F", function(T) T:ASSERT_EQ("f", X.type "Makefile") end),
     TT("value D", function(T) T:ASSERT_EQ("d", X.type "src") end),
 },
 
-{
-    name="permissions",
+TCASE "permissions" {
     TT("present", function(T) T:ASSERT_EQ("function", type(X.permissions)) end),
     TT("string", function(T) T:ASSERT_EQ("string", type(X.permissions "Makefile")) end),
     TT("rwxrwxrwx", function(T) T:ASSERT(X.permissions "Makefile" :match "rw.r..r..") end),
 },
 
-{
-    name="copy_options",
+TCASE "copy_options" {
     TT("present", function(T) T:ASSERT_EQ("table", type(X.copy_options)) end),
     TT("expected_values", function(T)
         for k,e in ipairs {"none", "skip_existing", "overwrite_existing", "update_existing", "recursive",
