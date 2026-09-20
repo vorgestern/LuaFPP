@@ -448,7 +448,7 @@ int myrelative(lua_State*L)
 int mycopyfile(lua_State*L)
 {
     LuaStack Q(L);
-    if (height(Q)<2) return Q<<"copy_file requires at least two arguments (string path from, to; copy_options=none)">>luaerror;
+    if (height(Q)<2) return Q<<"copy_file requires at least two arguments (string path from, to); copy_options=none is optional)">>luaerror;
     const fspath from=Q.tostring(1), to=Q.tostring(2);
     error_code ec;
     if (height(Q)>2)
