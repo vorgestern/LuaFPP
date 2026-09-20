@@ -445,6 +445,27 @@ int myrelative(lua_State*L)
     }
 }
 
+int mycopy(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)<2) return Q<<"copy requires at least two arguments (string path from, to); copy_options=none is optional">>luaerror;
+    const fspath from=Q.tostring(1), to=Q.tostring(2);
+    error_code ec;
+    if (height(Q)>2)
+    {
+        auto opt=argcheck_copy_options(Q, 3);
+        filesystem::copy(from, to, opt, ec);
+        if (ec.value()==0) return Q<<true, 1;
+        else return Q<<luanil<<format("system error {} for filesystem::copy('{}', '{}', {}).", ec.value(), from.string(), to.string(), tostring(opt)), 2;
+    }
+    else
+    {
+        filesystem::copy(from, to, ec);
+        if (ec.value()==0) return Q<<true, 1;
+        else return Q<<luanil<<format("system error {} for filesystem::copy('{}', '{}').", ec.value(), from.string(), to.string()), 2;
+    }
+}
+
 int mycopyfile(lua_State*L)
 {
     LuaStack Q(L);
@@ -497,6 +518,7 @@ extern "C" LUAFPP_EXPORTS int luaopen_luafpp(lua_State*L)
         <<myweakly_canonical>>LuaField("weakly_canonical")
         <<myrelative>>LuaField("relative")
         <<myabsolute>>LuaField("absolute")
+        <<mycopy>>LuaField("copy")
         <<mycopyfile>>LuaField("copy_file");
 
     pushenum_copyoptions(Q); Q>>LuaField("copy_options");

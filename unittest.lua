@@ -323,6 +323,34 @@ TCASE "copy_options" {
     end),
 },
 
+TCASE "copy" {
+    setup=function(T)
+        T:ASSERT(X.exists "testdir/project/hiersrc/")
+        X.rmrf "testdir/var/copiedsrc"
+    end,
+    TT("present", function(T) T:ASSERT_EQ("function", type(X.copy)) end),
+    TT("existing", function(T)
+        T:ASSERT(X.copy("testdir/project/hiersrc/", "testdir/var/copiedsrc/", X.copy_options.recursive))
+        local src=X.walkdir("testdir/project/hiersrc/", "rN")
+        local dst=X.walkdir("testdir/var/copiedsrc/", "rN")
+        T:ASSERT_EQ(#src, #dst)
+        T:PRINTF("Copy has %d files", #dst)
+        T:PRINTF("Copied files/folders:\n%s", table.concat(dst, "\n"))
+    end),
+    TT("nooverwrite_expect_error", function(T)
+        local ok,err=X.copy("testdir/project/hiersrc/", "testdir/var/copiedsrc/", X.copy_options.recursive)
+        T:ASSERT_NIL(ok)
+        T:PRINTF("Error returned: '%s'", err)
+    end),
+    TT("allow_overwrite", function(T)
+        T:ASSERT(X.copy("testdir/project/hiersrc/", "testdir/var/copiedsrc/", X.copy_options.recursive|X.copy_options.overwrite_existing))
+    end),
+    teardown=function(T)
+        T:ASSERT(X.exists "testdir/var/copiedsrc/")
+        X.rmrf "testdir/var/copiedsrc"
+    end,
+},
+
 TCASE "copy_file" {
     setup=function(T)
         T:ASSERT(X.exists "testdir/project/Readme.md")

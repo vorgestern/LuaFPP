@@ -67,6 +67,12 @@ These do what you would expect:
     end
 
     assert(<b>fpp.exists</b> "testdir")               Check whether directory exists (true/nil)
+
+    local ok,err=fpp.copy("testdir/project/hiersrc/", "testdir/var/copiedsrc/", fpp.copy_options.recursive)   Copy folder recursively, fail if target exists.
+
+    local ok,err=fpp.copy("testdir/project/hiersrc/", "testdir/var/copiedsrc/",
+        fpp.copy_options.recursive | fpp.copy_options.overwrite_existing)                                     Copy folder recursively, overwrite if target exists.
+                                                                                                              fpp.copy handles both files and folders.
 </pre>
 
 ## Files
