@@ -118,8 +118,7 @@ int pushenum_copyoptions(lua_State*L)
     Q.dup(); Q>>LuaMetaMethod::index;          // [M, metatable]
     auto mt=Q.index(-1);
 
-    Q<<LuaValue(LUA_REGISTRYINDEX)<<mt>>LuaField(mtname);
-    Q.drop(1);
+    Q<<LuaValue(LUA_REGISTRYINDEX)<<mt>>LuaField(mtname)<<luadrop;
 
     Q<<LuaTable();                              // [M, metatable, E]
         pushenum(Q, co::none);                  Q>>LuaField("none");
@@ -133,8 +132,7 @@ int pushenum_copyoptions(lua_State*L)
         pushenum(Q, co::create_symlinks);       Q>>LuaField("create_symlinks");
         pushenum(Q, co::create_hard_links);     Q>>LuaField("create_hard_links");
 
-    Q<<luaswap;
-    Q.drop(1);
+    Q<<luaswap<<luadrop;
 
     return 1;
 }

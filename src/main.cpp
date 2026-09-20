@@ -453,7 +453,7 @@ extern "C" LUAFPP_EXPORTS int luaopen_luafpp(lua_State*L)
 {
     LuaStack Q(L);
     Q   <<LuaTable()
-        <<"0.1.2">>LuaField("version")
+        <<"0.1.3">>LuaField("version")
         <<"https://github.com/vorgestern/LuaFPP.git">>LuaField("url")
         <<exists>>LuaField("exists")
         <<permissions>>LuaField("permissions")
