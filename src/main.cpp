@@ -456,7 +456,7 @@ int mycopyfile(lua_State*L)
         auto opt=argcheck_copy_options(Q, 3);
         const auto flag=filesystem::copy_file(from, to, opt, ec);
         if (ec.value()==0) return Q<<flag, 1;
-        else return Q<<luanil<<format("system error {} for filesystem::copy_file('{}', '{}', '{}').", ec.value(), from.string(), to.string(), "opt"), 2;
+        else return Q<<luanil<<format("system error {} for filesystem::copy_file('{}', '{}', {}).", ec.value(), from.string(), to.string(), tostring(opt)), 2;
     }
     else
     {
