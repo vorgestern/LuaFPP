@@ -328,6 +328,7 @@ TCASE "copy_file" {
         T:ASSERT(X.exists "testdir/project/Readme.md")
         os.remove "testdir/var/Readme.md"
     end,
+    TT("present", function(T) T:ASSERT_EQ("function", type(X.copy_file)) end),
     TT("existing", function(T)
         T:ASSERT(X.copy_file("testdir/project/Readme.md", "testdir/var/Readme.md"))
     end),
