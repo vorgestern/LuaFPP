@@ -372,4 +372,14 @@ TCASE "copy_file" {
     end,
 },
 
+TCASE "equivalent" {
+    TT("present", function(T) T:ASSERT_EQ("function", type(X.equivalent)) end),
+    TT("existing", function(T)
+        T:ASSERT(X.equivalent("testdir/project/Readme.md", "testdir/project/../project/Readme.md"))
+    end),
+    TT("nonexisting", function(T)
+        T:ASSERT_NIL(X.equivalent("testdir/project/Nonexisting.md", "testdir/project/Nonexisting.md"))
+    end),
+},
+
 }

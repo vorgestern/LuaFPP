@@ -101,6 +101,11 @@ These do what you would expect:
 
     local ok,err=<b>fpp.copy_file</b>(source, target,
         fpp.copy_options.overwrite_existing)                Copy file, overwrite if target exists
+
+    local A,B=
+        "testdir/project/Readme.md",
+        "testdir/project/../project/Readme.md"
+    local ok,err=<b>fpp.equivalent</b>(A, B)                Do A and B refer to the same (existing) file?
 </pre>
 
 ## File-/Dir-Types

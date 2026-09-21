@@ -487,6 +487,18 @@ int mycopyfile(lua_State*L)
     }
 }
 
+int myequivalent(lua_State*L)
+{
+    LuaStack Q(L);
+    if (height(Q)!=2) return Q<<"equivalent requires two arguments (string path A, B)">>luaerror;
+    const fspath A=Q.tostring(1), B=Q.tostring(2);
+
+    error_code ec;
+    const auto b=filesystem::equivalent(A, B, ec);
+    if (ec.value()==0) return Q<<b, 1;
+    else return Q<<luanil<<format("system error {} for filesystem::equivalent('{}', '{}').", ec.value(), A.string(), B.string()), 2;
+}
+
 } // anon
 
 int pushenum_copyoptions(lua_State*); // Push a table with a uservalue for each value of filesystem::copy_options.
@@ -519,7 +531,8 @@ extern "C" LUAFPP_EXPORTS int luaopen_luafpp(lua_State*L)
         <<myrelative>>LuaField("relative")
         <<myabsolute>>LuaField("absolute")
         <<mycopy>>LuaField("copy")
-        <<mycopyfile>>LuaField("copy_file");
+        <<mycopyfile>>LuaField("copy_file")
+        <<myequivalent>>LuaField("equivalent");
 
     pushenum_copyoptions(Q); Q>>LuaField("copy_options");
 
