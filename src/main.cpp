@@ -56,7 +56,7 @@ namespace {
                     return typestring(filesystem::status(was)); // .type()
                 }
 
-extern "C" int exists(lua_State*L)
+int exists(lua_State*L)
 {
     LuaStack Q(L);
     if (height(Q)<1) return Q<<"exists requires argument (string path)">>luaerror;
@@ -66,7 +66,7 @@ extern "C" int exists(lua_State*L)
     else return Q<<luanil,1;
 }
 
-extern "C" int permissions(lua_State*L)
+int permissions(lua_State*L)
 {
     LuaStack Q(L);
     if (height(Q)<1) return Q<<"permissions requires argument (string path)">>luaerror;
@@ -74,7 +74,7 @@ extern "C" int permissions(lua_State*L)
     return Q<<permstring(was), 1;
 }
 
-extern "C" int type(lua_State*L)
+int type(lua_State*L)
 {
     LuaStack Q(L);
     if (height(Q)<1) return Q<<"type requires argument (string path)">>luaerror;
@@ -82,7 +82,7 @@ extern "C" int type(lua_State*L)
     return Q<<typestring(was), 1;
 }
 
-extern "C" int numlinks(lua_State*L)
+int numlinks(lua_State*L)
 {
     LuaStack Q(L);
     if (height(Q)<1) return Q<<"numlinks requires argument (string path)">>luaerror;
@@ -93,7 +93,7 @@ extern "C" int numlinks(lua_State*L)
     else return Q<<(int)nlink, 1;
 }
 
-extern "C" int filesize(lua_State*L)
+int filesize(lua_State*L)
 {
     LuaStack Q(L);
     if (height(Q)<1) return Q<<"filesize requires argument (string path)">>luaerror;
@@ -105,7 +105,7 @@ extern "C" int filesize(lua_State*L)
     else return Q<<(int)numbytes, 1;
 }
 
-extern "C" int pwd(lua_State*L)
+int pwd(lua_State*L)
 {
     LuaStack Q(L);
     auto X=filesystem::current_path().string();
@@ -113,7 +113,7 @@ extern "C" int pwd(lua_State*L)
     return 1;
 }
 
-extern "C" int cd(lua_State*L)
+int cd(lua_State*L)
 {
     LuaStack Q(L);
     if (height(Q)==1)
@@ -132,7 +132,7 @@ extern "C" int cd(lua_State*L)
     else return Q<<luanil<<"cd requires argument (string path)", 2;
 }
 
-extern "C" int subdirs(lua_State*L)
+int subdirs(lua_State*L)
 {
     LuaStack Q(L);
     if (height(Q)==1)
@@ -251,7 +251,7 @@ static void HTable(lua_State*L, const vector<fshentry>&A) // Push one list corre
 
 // =====================================================================
 
-extern "C" int walkdir(lua_State*L)
+int walkdir(lua_State*L)
 {
     LuaStack Q(L);
     if (height(Q)<1) return Q<<"walkdir requires argument (string path)">>luaerror;
@@ -315,7 +315,7 @@ extern "C" int walkdir(lua_State*L)
     return 1;
 }
 
-extern "C" int mymkdir(lua_State*L)
+int mymkdir(lua_State*L)
 {
     LuaStack Q(L);
     if (height(Q)<1) return Q<<"mkdir requires argument (string path)">>luaerror;
@@ -325,7 +325,7 @@ extern "C" int mymkdir(lua_State*L)
     else return Q<<true, 1;
 }
 
-extern "C" int myrmdir(lua_State*L)
+int myrmdir(lua_State*L)
 {
     LuaStack Q(L);
     if (height(Q)<1) return Q<<"rmdir requires argument (string path)">>luaerror;
@@ -340,7 +340,7 @@ extern "C" int myrmdir(lua_State*L)
     else return Q<<true, 1;
 }
 
-extern "C" int rmrf(lua_State*L)
+int rmrf(lua_State*L)
 {
     LuaStack Q(L);
     if (height(Q)<1) return Q<<"rmrf requires argument (string path)">>luaerror;
@@ -372,7 +372,7 @@ extern "C" int rmrf(lua_State*L)
     }
 }
 
-extern "C" int mytouch(lua_State*L)
+int mytouch(lua_State*L)
 {
     LuaStack Q(L);
     if (height(Q)<1) return Q<<"touch requires argument (string path)">>luaerror;
